@@ -23,7 +23,7 @@ import Link from "next/link";
 import Image from "next/image";
 import QRCode from "qrcode";
 
-const VERIFICACION_BASE_URL = "https://zramos2305.github.io/VERIFICACIONQR/?doc=";
+const VERIFICACION_BASE_URL = "https://sistemainstitucional.vercel.app/verificar?doc=";
 
 function generarCodigo() {
   const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
