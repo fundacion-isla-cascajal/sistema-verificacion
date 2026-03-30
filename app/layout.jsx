@@ -9,6 +9,8 @@ export const metadata = {
   title: 'Fundación Isla Cascajal - Sistema de Verificación',
   description: 'Sistema oficial de verificación de documentos y certificados de la Fundación Isla Cascajal',
   generator: 'v0.app',
+  manifest: '/manifest.json', // 👈 AQUI
+
   icons: {
     icon: [
       {
@@ -27,11 +29,11 @@ export const metadata = {
     apple: '/apple-icon.png',
   },
 }
-
 export const viewport = {
   themeColor: '#1e3a5f',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover', // 👈 mejora en móviles
 }
 
 export default function RootLayout({ children }) {
