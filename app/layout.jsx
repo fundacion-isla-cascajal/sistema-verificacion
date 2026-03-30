@@ -7,26 +7,23 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata = {
   title: 'Fundación Isla Cascajal - Sistema de Verificación',
-  description: 'Sistema oficial de verificación de documentos y certificados de la Fundación Isla Cascajal',
-  generator: 'v0.app',
-  manifest: '/manifest.json', // 👈 AQUI
+  description: 'Sistema oficial de verificación de documentos',
+
+  manifest: '/manifest.json',
+
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Isla Cascajal',
+  },
 
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
-    apple: '/apple-icon.png',
+    apple: '/logo.png', // 👈 CLAVE
   },
 }
 export const viewport = {
