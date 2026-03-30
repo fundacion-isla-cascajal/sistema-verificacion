@@ -86,7 +86,7 @@ function exportarCSV(lista, nombre) {
   });
 
   const csv = [encabezados, ...filas]
-    .map((fila) => fila.map((valor) => `"${valor}"`).join(","))
+    .map((fila) => fila.map((valor) => `"${valor}"`).join(" ;"))
     .join("\n");
 
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
