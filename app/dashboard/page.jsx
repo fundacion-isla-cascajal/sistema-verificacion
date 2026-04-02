@@ -58,7 +58,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-
 const VERIFICACION_BASE_URL = "https://sistemainstitucional.vercel.app/verificar?doc=";
 
 function formatearFecha(fecha) {
@@ -79,7 +78,7 @@ function exportarCSV(lista, nombre) {
   }
 
   const encabezados = ["Código", "Nombre", "Cédula", "Tipo", "Detalle", "Estado", "Fecha"];
-  
+
   const filas = lista.map((item) => {
     const detalle = item.tipo === "certificado" ? (item.evento || "Evento") : "Miembro";
     return [
@@ -102,7 +101,7 @@ function exportarCSV(lista, nombre) {
   link.href = URL.createObjectURL(blob);
   link.download = `${nombre}.csv`;
   link.click();
-  
+
   toast.success(`Exportado: ${nombre}.csv`);
 }
 
@@ -173,7 +172,7 @@ export default function DashboardPage() {
     setUpdatingStatus(codigo);
     try {
       await actualizarEstado(codigo, nuevoEstado);
-      toast.success(`Estado cambiado a ${nuevoEstado}`);
+      toast.success(nuevoEstado === "activo" ? "Documento activado" : "Documento desactivado");
     } catch {
       toast.error("Error al cambiar estado");
     } finally {
@@ -197,13 +196,7 @@ export default function DashboardPage() {
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
+            <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
             <div>
               <h1 className="font-semibold text-foreground">Panel de Control</h1>
               <p className="text-xs text-muted-foreground">Fundación Isla Cascajal</p>
@@ -223,13 +216,11 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        {/* Stats Cards */}
+        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Documentos
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Documentos</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -240,9 +231,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Certificados
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Certificados</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -253,9 +242,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Afiliados
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Afiliados</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -270,13 +257,8 @@ export default function DashboardPage() {
         <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="flex flex-col lg:flex-row gap-4 justify-between">
-              {/* Export buttons */}
               <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => exportarCSV(documentos, "todos")}
-                >
+                <Button variant="outline" size="sm" onClick={() => exportarCSV(documentos, "todos")}>
                   <FileSpreadsheet className="h-4 w-4 mr-2" />
                   Todos
                 </Button>
@@ -284,12 +266,7 @@ export default function DashboardPage() {
                   variant="outline"
                   size="sm"
                   className="text-success border-success/30 hover:bg-success/10"
-                  onClick={() =>
-                    exportarCSV(
-                      documentos.filter((d) => d.tipo === "certificado"),
-                      "certificados"
-                    )
-                  }
+                  onClick={() => exportarCSV(documentos.filter((d) => d.tipo === "certificado"), "certificados")}
                 >
                   <GraduationCap className="h-4 w-4 mr-2" />
                   Certificados
@@ -298,19 +275,13 @@ export default function DashboardPage() {
                   variant="outline"
                   size="sm"
                   className="text-info border-info/30 hover:bg-info/10"
-                  onClick={() =>
-                    exportarCSV(
-                      documentos.filter((d) => d.tipo === "afiliado"),
-                      "afiliados"
-                    )
-                  }
+                  onClick={() => exportarCSV(documentos.filter((d) => d.tipo === "afiliado"), "afiliados")}
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Afiliados
                 </Button>
               </div>
 
-              {/* Search and filter */}
               <div className="flex flex-1 gap-3 max-w-xl">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -321,10 +292,7 @@ export default function DashboardPage() {
                     className="pl-10"
                   />
                 </div>
-                <Select
-                  value={filtroTipo}
-                  onValueChange={(value) => setFiltroTipo(value)}
-                >
+                <Select value={filtroTipo} onValueChange={(value) => setFiltroTipo(value)}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
@@ -336,7 +304,6 @@ export default function DashboardPage() {
                 </Select>
               </div>
 
-              {/* Add button */}
               <Button asChild>
                 <Link href="/generar">
                   <Plus className="h-4 w-4 mr-2" />
@@ -380,111 +347,118 @@ export default function DashboardPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {documentosFiltrados.map((doc) => (
-                      <TableRow key={doc.codigo}>
-                        <TableCell className="font-mono text-sm">{doc.codigo}</TableCell>
-                        <TableCell className="font-medium">{doc.nombre}</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {doc.cedula || "-"}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={doc.tipo === "certificado" ? "default" : "secondary"}
-                            className={
-                              doc.tipo === "certificado"
-                                ? "bg-success/10 text-success border-success/20"
-                                : "bg-info/10 text-info border-info/20"
-                            }
-                          >
-                            {doc.tipo === "certificado" ? "Certificado" : "Afiliado"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          {doc.tipo === "certificado" ? doc.evento : "Miembro"}
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={updatingStatus === doc.codigo}
-                                className={
-                                  doc.estado === "activo"
-                                    ? "text-success border-success/30 hover:bg-success/10"
-                                    : "text-destructive border-destructive/30 hover:bg-destructive/10"
-                                }
-                              >
-                                {updatingStatus === doc.codigo ? (
-                                  <Spinner className="h-3 w-3 mr-1" />
-                                ) : null}
-                                {doc.estado === "activo" ? "Activo" : "Inactivo"}
-                                <ChevronDown className="h-3 w-3 ml-1" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
-                              <DropdownMenuItem
-                                onClick={() => handleCambiarEstado(doc.codigo, "activo")}
-                                disabled={doc.estado === "activo"}
-                              >
-                                <span className="text-success">Activo</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleCambiarEstado(doc.codigo, "inactivo")}
-                                disabled={doc.estado === "inactivo"}
-                              >
-                                <span className="text-destructive">Inactivo</span>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                        <TableCell className="hidden xl:table-cell text-muted-foreground text-sm">
-                          {formatearFecha(doc.fecha)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => descargarQR(doc.codigo)}
-                              title="Descargar QR"
+                    {documentosFiltrados.map((doc) => {
+                      const esActivo = doc.estado === "activo";
+
+                      return (
+                        <TableRow key={doc.codigo}>
+                          <TableCell className="font-mono text-sm">{doc.codigo}</TableCell>
+                          <TableCell className="font-medium">{doc.nombre}</TableCell>
+                          <TableCell className="hidden md:table-cell">{doc.cedula || "-"}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={doc.tipo === "certificado" ? "default" : "secondary"}
+                              className={
+                                doc.tipo === "certificado"
+                                  ? "bg-success/10 text-success border-success/20"
+                                  : "bg-info/10 text-info border-info/20"
+                              }
                             >
-                              <QrCode className="h-4 w-4" />
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
+                              {doc.tipo === "certificado" ? "Certificado" : "Afiliado"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            {doc.tipo === "certificado" ? doc.evento : "Miembro"}
+                          </TableCell>
+
+                          {/* ESTADO con dropdown */}
+                          <TableCell className="hidden sm:table-cell">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
                                 <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-destructive hover:text-destructive"
-                                  title="Eliminar"
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={updatingStatus === doc.codigo}
+                                  className={
+                                    esActivo
+                                      ? "text-success border-success/30 hover:bg-success/10"
+                                      : "text-destructive border-destructive/30 hover:bg-destructive/10"
+                                  }
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  {updatingStatus === doc.codigo && (
+                                    <Spinner className="h-3 w-3 mr-1" />
+                                  )}
+                                  {esActivo ? "Activo" : "Inactivo"}
+                                  <ChevronDown className="h-3 w-3 ml-1" />
                                 </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Eliminar documento</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    ¿Estás seguro de eliminar el documento {doc.codigo}? Esta acción
-                                    no se puede deshacer.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleEliminar(doc.codigo)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start">
+                                <DropdownMenuItem
+                                  onClick={() => handleCambiarEstado(doc.codigo, "activo")}
+                                  disabled={esActivo}
+                                  className="cursor-pointer"
+                                >
+                                  <span className="text-success font-medium">✓ Activo</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleCambiarEstado(doc.codigo, "inactivo")}
+                                  disabled={!esActivo}
+                                  className="cursor-pointer"
+                                >
+                                  <span className="text-destructive font-medium">✕ Inactivo</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+
+                          <TableCell className="hidden xl:table-cell text-muted-foreground text-sm">
+                            {formatearFecha(doc.fecha)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => descargarQR(doc.codigo)}
+                                title="Descargar QR"
+                              >
+                                <QrCode className="h-4 w-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive hover:text-destructive"
+                                    title="Eliminar"
                                   >
-                                    Eliminar
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Eliminar documento</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      ¿Estás seguro de eliminar el documento {doc.codigo}? Esta
+                                      acción no se puede deshacer.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleEliminar(doc.codigo)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Eliminar
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>

@@ -40,6 +40,7 @@ function VerificarContent() {
         if (docSnap.exists()) {
           const docData = { codigo: docSnap.id, ...docSnap.data() };
           setDocumento(docData);
+          // "activo" → válido, cualquier otra cosa → inactivo
           if (docData.estado === "inactivo") {
             setEstado("inactive");
           } else {
@@ -59,11 +60,9 @@ function VerificarContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary p-4">
-      {/* Background Pattern - igual que login */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.03)_50%,rgba(255,255,255,0.03)_75%,transparent_75%,transparent)] bg-[length:60px_60px] pointer-events-none" />
-      
+
       <Card className="w-full max-w-md relative z-10 shadow-2xl border-0">
-        {/* Header */}
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
             <Image
@@ -132,7 +131,7 @@ function VerificarContent() {
                 Documento Inactivo
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Este documento se encuentra registrado pero está marcado como <strong>inactivo</strong> en el sistema.
+                Este documento está registrado pero se encuentra <strong>inactivo</strong> en el sistema.
               </p>
               <div className="space-y-3 text-left max-w-xs mx-auto">
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
@@ -160,7 +159,6 @@ function VerificarContent() {
 
           {estado === "valid" && documento && (
             <div className="space-y-6">
-              {/* Status Badge */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="h-8 w-8 text-success" />
@@ -176,7 +174,6 @@ function VerificarContent() {
                 </Badge>
               </div>
 
-              {/* Document Info */}
               <div className="space-y-4 pt-2">
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <User className="h-5 w-5 text-primary" />
@@ -185,7 +182,6 @@ function VerificarContent() {
                     <p className="font-medium">{documento.nombre}</p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <IdCard className="h-5 w-5 text-primary" />
                   <div>
@@ -193,7 +189,6 @@ function VerificarContent() {
                     <p className="font-mono font-medium">{documento.codigo}</p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Award className="h-5 w-5 text-primary" />
                   <div>
@@ -201,7 +196,6 @@ function VerificarContent() {
                     <p className="font-medium capitalize">{documento.tipo}</p>
                   </div>
                 </div>
-
                 {documento.tipo === "certificado" && documento.evento && (
                   <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                     <Calendar className="h-5 w-5 text-primary" />
@@ -211,19 +205,17 @@ function VerificarContent() {
                     </div>
                   </div>
                 )}
-
                 {documento.tipo === "afiliado" && (
                   <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                     <ShieldCheck className="h-5 w-5 text-primary" />
                     <div>
                       <p className="text-xs text-muted-foreground">Estado</p>
-                      <p className="font-medium">{documento.estado}</p>
+                      <p className="font-medium capitalize">{documento.estado}</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Validation Message */}
               <div className="p-4 bg-success/5 border border-success/20 rounded-lg text-center">
                 <p className="text-sm text-success">
                   Este registro ha sido validado correctamente en el sistema institucional.
@@ -233,7 +225,6 @@ function VerificarContent() {
           )}
         </CardContent>
 
-        {/* Footer */}
         <div className="px-6 py-4 bg-muted/30 rounded-b-xl text-center border-t">
           <p className="text-xs text-muted-foreground">
             Documento validado digitalmente por Fundación Isla Cascajal

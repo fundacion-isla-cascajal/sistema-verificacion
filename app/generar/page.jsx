@@ -75,7 +75,6 @@ export default function GenerarPage() {
     setIsCreating(true);
 
     try {
-      // Validar duplicado solo para afiliados
       if (formData.tipo === "afiliado") {
         const q = query(
           collection(db, "documentos"),
@@ -83,7 +82,7 @@ export default function GenerarPage() {
           where("tipo", "==", "afiliado")
         );
         const querySnapshot = await getDocs(q);
-        
+
         if (!querySnapshot.empty) {
           toast.error("Esta persona ya está afiliada");
           setIsCreating(false);
@@ -99,11 +98,10 @@ export default function GenerarPage() {
         cedula: formData.cedula.trim(),
         tipo: formData.tipo,
         evento: formData.tipo === "certificado" ? formData.evento : null,
-        estado: "válido",
+        estado: "activo", // ← siempre "activo" al crear
         fecha: new Date().toISOString(),
       });
 
-      // Generar QR
       const qrDataUrl = await QRCode.toDataURL(link, {
         width: 200,
         margin: 2,
@@ -125,7 +123,6 @@ export default function GenerarPage() {
 
   const handleDescargarQR = () => {
     if (!documentoCreado) return;
-    
     const link = document.createElement("a");
     link.href = documentoCreado.qrDataUrl;
     link.download = `QR_${documentoCreado.codigo}.png`;
@@ -151,7 +148,6 @@ export default function GenerarPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
@@ -160,13 +156,7 @@ export default function GenerarPage() {
             </Link>
           </Button>
           <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
+            <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
             <div>
               <h1 className="font-semibold text-foreground">Generar Documento</h1>
               <p className="text-xs text-muted-foreground">Fundación Isla Cascajal</p>
@@ -177,7 +167,6 @@ export default function GenerarPage() {
 
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         {documentoCreado ? (
-          // Documento creado exitosamente
           <Card className="text-center">
             <CardHeader className="pb-4">
               <div className="mx-auto w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
@@ -198,14 +187,12 @@ export default function GenerarPage() {
                   className="mx-auto"
                 />
               </div>
-
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Código del documento</p>
                 <Badge variant="secondary" className="text-lg font-mono px-4 py-2">
                   {documentoCreado.codigo}
                 </Badge>
               </div>
-
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button onClick={handleDescargarQR} variant="outline">
                   <Download className="h-4 w-4 mr-2" />
@@ -225,7 +212,6 @@ export default function GenerarPage() {
             </CardContent>
           </Card>
         ) : (
-          // Formulario de creación
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -328,7 +314,6 @@ export default function GenerarPage() {
               </CardContent>
             </Card>
 
-            {/* Preview */}
             {mostrarPreview && (
               <Card className="border-primary/20 bg-primary/5">
                 <CardHeader className="pb-3">
