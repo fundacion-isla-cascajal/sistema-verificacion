@@ -31,12 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Empty } from "@/components/ui/empty";
@@ -52,7 +46,8 @@ import {
   QrCode,
   User,
   FileText,
-  ChevronDown,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -116,8 +111,6 @@ export default function DashboardPage() {
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [filtroTipo, setFiltroTipo] = useState("todos");
-
-  // FIX: AlertDialog controlado desde fuera del map para no bloquear el DropdownMenu
   const [codigoAEliminar, setCodigoAEliminar] = useState(null);
 
   const documentosFiltrados = useMemo(() => {
@@ -155,7 +148,9 @@ export default function DashboardPage() {
     }
   };
 
-  const handleCambiarEstado = async (codigo, nuevoEstado) => {
+  // Toggle directo: si está activo lo pasa a inactivo y viceversa
+  const handleToggleEstado = async (codigo, estadoActual) => {
+    const nuevoEstado = estadoActual === "activo" ? "inactivo" : "activo";
     setUpdatingStatus(codigo);
     try {
       await actualizarEstado(codigo, nuevoEstado);
@@ -336,6 +331,7 @@ export default function DashboardPage() {
                   <TableBody>
                     {documentosFiltrados.map((doc) => {
                       const esActivo = doc.estado === "activo";
+                      const cargando = updatingStatus === doc.codigo;
 
                       return (
                         <TableRow key={doc.codigo}>
@@ -358,44 +354,29 @@ export default function DashboardPage() {
                             {doc.tipo === "certificado" ? doc.evento : "Miembro"}
                           </TableCell>
 
-                          {/* ESTADO — DropdownMenu limpio, sin AlertDialog anidado */}
+                          {/* ESTADO — botón toggle simple, sin DropdownMenu ni portal */}
                           <TableCell className="hidden sm:table-cell">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  disabled={updatingStatus === doc.codigo}
-                                  className={
-                                    esActivo
-                                      ? "text-success border-success/30 hover:bg-success/10"
-                                      : "text-destructive border-destructive/30 hover:bg-destructive/10"
-                                  }
-                                >
-                                  {updatingStatus === doc.codigo && (
-                                    <Spinner className="h-3 w-3 mr-1" />
-                                  )}
-                                  {esActivo ? "Activo" : "Inactivo"}
-                                  <ChevronDown className="h-3 w-3 ml-1" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start">
-                                <DropdownMenuItem
-                                  onClick={() => handleCambiarEstado(doc.codigo, "activo")}
-                                  disabled={esActivo}
-                                  className="cursor-pointer"
-                                >
-                                  <span className="text-success font-medium">✓ Activo</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleCambiarEstado(doc.codigo, "inactivo")}
-                                  disabled={!esActivo}
-                                  className="cursor-pointer"
-                                >
-                                  <span className="text-destructive font-medium">✕ Inactivo</span>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <button
+                              onClick={() => handleToggleEstado(doc.codigo, doc.estado)}
+                              disabled={cargando}
+                              className={`
+                                inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
+                                border transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+                                ${esActivo
+                                  ? "bg-success/10 text-success border-success/30 hover:bg-success/20"
+                                  : "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20"
+                                }
+                              `}
+                            >
+                              {cargando ? (
+                                <Spinner className="h-3 w-3" />
+                              ) : esActivo ? (
+                                <ToggleRight className="h-3.5 w-3.5" />
+                              ) : (
+                                <ToggleLeft className="h-3.5 w-3.5" />
+                              )}
+                              {esActivo ? "Activo" : "Inactivo"}
+                            </button>
                           </TableCell>
 
                           <TableCell className="hidden xl:table-cell text-muted-foreground text-sm">
@@ -412,7 +393,6 @@ export default function DashboardPage() {
                               >
                                 <QrCode className="h-4 w-4" />
                               </Button>
-                              {/* FIX: solo setea el código, el AlertDialog está fuera del map */}
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -435,13 +415,14 @@ export default function DashboardPage() {
         </Card>
       </main>
 
-      {/* AlertDialog FUERA del map — evita conflicto con DropdownMenu */}
+      {/* AlertDialog único fuera del map */}
       <AlertDialog open={!!codigoAEliminar} onOpenChange={(open) => !open && setCodigoAEliminar(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Eliminar documento</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de eliminar el documento <span className="font-mono font-semibold">{codigoAEliminar}</span>? Esta acción no se puede deshacer.
+              ¿Estás seguro de eliminar el documento{" "}
+              <span className="font-mono font-semibold">{codigoAEliminar}</span>? Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
