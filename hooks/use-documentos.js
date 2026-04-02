@@ -10,18 +10,22 @@ export function useDocumentos() {
 
   useEffect(() => {
     const q = query(collection(db, "documentos"), orderBy("fecha", "desc"));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map((doc) => ({
-        codigo: doc.id,
-        ...doc.data(),
-      }));
-      setDocumentos(docs);
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error fetching documentos:", error);
-      setIsLoading(false);
-    });
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          codigo: doc.id,
+          ...doc.data(),
+        }));
+        setDocumentos(docs);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching documentos:", error);
+        setIsLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
@@ -30,6 +34,7 @@ export function useDocumentos() {
     await deleteDoc(doc(db, "documentos", codigo));
   };
 
+  // nuevoEstado: "activo" | "inactivo"
   const actualizarEstado = async (codigo, nuevoEstado) => {
     await updateDoc(doc(db, "documentos", codigo), {
       estado: nuevoEstado,
