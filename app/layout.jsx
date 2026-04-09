@@ -35,8 +35,20 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+      <body className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}>
+        <div className="flex-1">
+          {children}
+        </div>
+        <footer className="py-8 bg-card border-t mt-auto">
+          <div className="container mx-auto px-4 text-center space-y-2">
+            <p className="text-sm font-medium text-foreground/70 uppercase tracking-widest">
+              Aplicación desarrollada por Zayra Ramos
+            </p>
+            <p className="text-xs text-muted-foreground">
+              para Fundación Isla Cascajal
+            </p>
+          </div>
+        </footer>
         <Toaster richColors position="top-center" />
         <Analytics />
       </body>
