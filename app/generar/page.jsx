@@ -201,7 +201,7 @@ export default function GenerarPage() {
                   Descargar QR
                 </Button>
                 <Button variant="outline" asChild>
-                  <a href={documentoCreado.link} target="_blank" rel="noopener noreferrer">
+                  <a href={`${documentoCreado.link}&source=generar`} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Verificar
                   </a>

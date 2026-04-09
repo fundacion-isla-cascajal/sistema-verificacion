@@ -16,12 +16,16 @@ import {
   Award,
   ShieldCheck,
   AlertCircle,
+  ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 function VerificarContent() {
   const searchParams = useSearchParams();
   const codigo = searchParams.get("doc")?.trim().toUpperCase();
+  const source = searchParams.get("source");
 
   const [estado, setEstado] = useState("loading");
   const [documento, setDocumento] = useState(null);
@@ -59,8 +63,19 @@ function VerificarContent() {
   }, [codigo]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary p-4">
+    <div className="min-h-screen flex items-center justify-center bg-primary p-4 relative">
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.03)_50%,rgba(255,255,255,0.03)_75%,transparent_75%,transparent)] bg-[length:60px_60px] pointer-events-none" />
+
+      {source === "generar" && (
+        <div className="absolute top-4 left-4 z-20">
+          <Button variant="secondary" asChild>
+            <Link href="/dashboard">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver al Dashboard
+            </Link>
+          </Button>
+        </div>
+      )}
 
       <Card className="w-full max-w-md relative z-10 shadow-2xl border-0">
         <CardHeader className="text-center pb-4">
