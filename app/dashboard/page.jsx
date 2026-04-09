@@ -54,6 +54,7 @@ import Image from "next/image";
 
 const VERIFICACION_BASE_URL = "https://sistemainstitucional.vercel.app/verificar?doc=";
 
+// Función auxiliar para dar formato legible a la fecha (por ejemplo: "22 oct 2023, 14:30")
 function formatearFecha(fecha) {
   if (!fecha) return "-";
   return new Date(fecha).toLocaleDateString("es-CO", {
@@ -65,6 +66,7 @@ function formatearFecha(fecha) {
   });
 }
 
+// Función encargada de exportar la información actual a un archivo CSV (Excel)
 function exportarCSV(lista, nombre) {
   if (lista.length === 0) {
     toast.error("No hay datos para exportar");
@@ -89,6 +91,7 @@ function exportarCSV(lista, nombre) {
   toast.success(`Exportado: ${nombre}.csv`);
 }
 
+// Función asíncrona para generar un código QR y forzar su descarga como imagen PNG
 async function descargarQR(codigo) {
   const link = VERIFICACION_BASE_URL + codigo;
   const urlQR = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}`;
@@ -109,7 +112,9 @@ async function descargarQR(codigo) {
   }
 }
 
+// Componente Principal: Vista del panel de administración (Dashboard)
 export default function DashboardPage() {
+  // Extraemos variables de autenticación y métodos del custom hook (useAuth y useDocumentos)
   const { user, loading: authLoading, logout } = useAuth();
   const { documentos, isLoading, eliminarDocumento, actualizarEstado } = useDocumentos();
 
@@ -118,6 +123,8 @@ export default function DashboardPage() {
   const [filtroTipo, setFiltroTipo] = useState("todos");
   const [codigoAEliminar, setCodigoAEliminar] = useState(null);
 
+  // Hook useMemo para filtrar documentos de acuerdo a las opciones de búsqueda y tipo seleccionadas. 
+  // Esto previene que se re-genere si cambian otras cosas.
   const documentosFiltrados = useMemo(() => {
     let resultado = documentos;
     if (busqueda) {
@@ -135,6 +142,7 @@ export default function DashboardPage() {
     return resultado;
   }, [documentos, busqueda, filtroTipo]);
 
+  // useMemo para calcular las estadísticas globales (total, cantidad de certificados, etc.)
   const stats = useMemo(() => {
     const certificados = documentos.filter((d) => d.tipo === "certificado").length;
     const afiliados = documentos.filter((d) => d.tipo === "afiliado").length;
@@ -142,6 +150,7 @@ export default function DashboardPage() {
     return { total: documentos.length, certificados, afiliados, documentosGenerales };
   }, [documentos]);
 
+  // Elimina un documento seleccionado y resetea la variable de "codigoAEliminar"
   const handleEliminar = async () => {
     if (!codigoAEliminar) return;
     try {
@@ -155,6 +164,7 @@ export default function DashboardPage() {
   };
 
   // Toggle directo: si está activo lo pasa a inactivo y viceversa
+  // Alternador visual y lógico para los afiliados (Activo <-> Inactivo). Actualiza directo en Firebase
   const handleToggleEstado = async (codigo, estadoActual) => {
     const nuevoEstado = estadoActual === "activo" ? "inactivo" : "activo";
     setUpdatingStatus(codigo);

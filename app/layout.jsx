@@ -3,8 +3,10 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 import './globals.css'
 
+// Configuramos la fuente web "Inter" desde Google Fonts para toda la app
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+// Metadatos globales: Sirven para establecer el nombre de la página y SEO
 export const metadata = {
   title: 'Fundación Isla Cascajal - Sistema de Verificación',
   description: 'Sistema oficial de verificación de documentos',
@@ -32,6 +34,7 @@ export const viewport = {
   viewportFit: 'cover', // 👈 mejora en móviles
 }
 
+// Función Layout Raíz de Next.js: Es la estructura inamovible que contiene las vistas
 export default function RootLayout({ children }) {
   return (
     <html lang="es">

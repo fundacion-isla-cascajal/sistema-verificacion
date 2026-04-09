@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+// Componente que procesa la búsqueda en la Base de Datos usando el código proveído en la URL
 function VerificarContent() {
   const searchParams = useSearchParams();
   const codigo = searchParams.get("doc")?.trim().toUpperCase();
@@ -30,6 +31,7 @@ function VerificarContent() {
   const [estado, setEstado] = useState("loading");
   const [documento, setDocumento] = useState(null);
 
+  // Efecto que se dispara automáticamente: Busca el documento y valida si su estado no es inactivo
   useEffect(() => {
     if (!codigo) {
       setEstado("no-code");
@@ -261,6 +263,7 @@ function VerificarContent() {
   );
 }
 
+// Contenedor principal de la página. Es necesario englobar todo en "Suspense" cuando se lee de la URL en Next.js
 export default function VerificarPage() {
   return (
     <Suspense

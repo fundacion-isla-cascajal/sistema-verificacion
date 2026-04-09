@@ -25,6 +25,7 @@ import QRCode from "qrcode";
 
 const VERIFICACION_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/verificar?doc=";
 
+// Función auxiliar para generar un código alfanumérico aleatorio (ejemplo: FICONG-4F8A0X1P)
 function generarCodigo() {
   const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let codigo = "FICONG-";
@@ -34,6 +35,7 @@ function generarCodigo() {
   return codigo;
 }
 
+// Componente de Generar: Se encarga de la captura de datos y subida a Firebase
 export default function GenerarPage() {
   const { user, loading: authLoading } = useAuth();
   const [formData, setFormData] = useState({
@@ -47,12 +49,14 @@ export default function GenerarPage() {
   const [documentoCreado, setDocumentoCreado] = useState(null);
   const [mostrarPreview, setMostrarPreview] = useState(false);
 
+  // Cuando el usuario modifica un input en el formulario, actualizamos el respectivo estado
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setDocumentoCreado(null);
     setMostrarPreview(false);
   };
 
+  // Valida que los campos obligatorios del formulario no estén vacíos.
   const isFormValid = () => {
     if (!formData.nombre || !formData.cedula || !formData.tipo) return false;
     if (formData.tipo === "certificado" && !formData.evento) return false;
@@ -67,6 +71,7 @@ export default function GenerarPage() {
     setMostrarPreview(true);
   };
 
+  // Ejecuta la creación del registro y lo guarda en la base de datos Firestore
   const handleCrear = async () => {
     if (!isFormValid()) {
       toast.error("Por favor, completa todos los campos requeridos");
@@ -104,6 +109,7 @@ export default function GenerarPage() {
         fecha: new Date().toISOString(),
       });
 
+      // Crea en paralelo un código QR visual con la librería qrcode
       const qrDataUrl = await QRCode.toDataURL(link, {
         width: 200,
         margin: 2,
@@ -123,6 +129,7 @@ export default function GenerarPage() {
     }
   };
 
+  // Automatiza la descarga del código QR una vez se generó el registro con éxito
   const handleDescargarQR = () => {
     if (!documentoCreado) return;
     const link = document.createElement("a");
