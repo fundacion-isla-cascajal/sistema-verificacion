@@ -38,6 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Empty } from "@/components/ui/empty";
@@ -56,6 +57,7 @@ import {
   ToggleLeft,
   ToggleRight,
   Info,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -132,6 +134,27 @@ export default function DashboardPage() {
   const [codigoAEliminar, setCodigoAEliminar] = useState(null);
   const [infoDoc, setInfoDoc] = useState(null);
   const [confirmarInactivacion, setConfirmarInactivacion] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const expirationDates = useMemo(() => {
+    return documentos
+      .filter((d) => d.tipo === "afiliado" && d.fechaExpiracion)
+      .map((d) => new Date(d.fechaExpiracion));
+  }, [documentos]);
+
+  const expiringOnSelectedDate = useMemo(() => {
+    if (!selectedDate || !documentos) return [];
+    return documentos.filter((doc) => {
+      if (doc.tipo !== "afiliado" || !doc.fechaExpiracion) return false;
+      const docDate = new Date(doc.fechaExpiracion);
+      return (
+        docDate.getDate() === selectedDate.getDate() &&
+        docDate.getMonth() === selectedDate.getMonth() &&
+        docDate.getFullYear() === selectedDate.getFullYear()
+      );
+    });
+  }, [selectedDate, documentos]);
 
   // Hook useMemo para filtrar documentos de acuerdo a las opciones de búsqueda y tipo seleccionadas. 
   // Esto previene que se re-genere si cambian otras cosas.
@@ -333,12 +356,18 @@ export default function DashboardPage() {
                 </Select>
               </div>
 
-              <Button asChild>
-                <Link href="/generar">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Agregar
-                </Link>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setShowCalendar(true)}>
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Calendario</span>
+                </Button>
+                <Button asChild>
+                  <Link href="/generar">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Agregar
+                  </Link>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -592,6 +621,66 @@ export default function DashboardPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal de Calendario de Expiraciones */}
+      <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Calendario de Vencimientos</DialogTitle>
+            <DialogDescription>
+              Seleccione un día para ver los afiliados que expiran en esa fecha. Los días destacados indican expiraciones.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col lg:flex-row gap-6 mt-4">
+            <div className="bg-muted/30 p-2 rounded-xl flex justify-center border w-fit mx-auto lg:mx-0">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(day) => day && setSelectedDate(day)}
+                modifiers={{ expirations: expirationDates }}
+                modifiersClassNames={{ expirations: "bg-destructive/20 text-destructive font-bold rounded-md" }}
+              />
+            </div>
+            <div className="flex-1 bg-card rounded-xl border flex flex-col overflow-hidden">
+              <div className="bg-muted/50 p-4 border-b">
+                <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
+                  <CalendarIcon className="h-5 w-5" />
+                  {selectedDate.toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric" })}
+                </h3>
+              </div>
+              <div className="p-4 flex-1">
+                {expiringOnSelectedDate.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full min-h-[200px] text-muted-foreground gap-3">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                      <CalendarIcon className="h-6 w-6 opacity-50" />
+                    </div>
+                    <p className="text-sm">No hay afiliados que expiren en este día.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                    {expiringOnSelectedDate.map((doc) => (
+                      <div key={doc.codigo} className="bg-background hover:bg-muted/30 transition-colors p-4 rounded-lg border group relative">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3">
+                          <div>
+                            <p className="font-semibold text-base mb-1">{doc.nombre}</p>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+                              <span className="flex items-center gap-1"><IdCard className="h-3.5 w-3.5" /> {doc.cedula}</span>
+                              <span className="flex items-center gap-1"><QrCode className="h-3.5 w-3.5" /> {doc.codigo}</span>
+                            </div>
+                          </div>
+                          <Badge variant={doc.estado === "inactivo" || (doc.fechaExpiracion && new Date() > new Date(doc.fechaExpiracion)) ? "destructive" : "default"} className="w-fit shrink-0 shadow-sm">
+                            {(doc.estado === "inactivo" || (doc.fechaExpiracion && new Date() > new Date(doc.fechaExpiracion))) ? "Vencido / Inactivo" : "Por expirar"}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
