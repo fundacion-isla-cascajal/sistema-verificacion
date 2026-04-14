@@ -367,8 +367,7 @@ export default function DashboardPage() {
                   </TableHeader>
                   <TableBody>
                     {documentosFiltrados.map((doc) => {
-                      const isExpired = doc.tipo === "afiliado" && doc.fechaExpiracion && new Date() > new Date(doc.fechaExpiracion);
-                      const esActivo = doc.estado === "activo" && !isExpired;
+                      const esActivo = doc.estado === "activo";
                       const cargando = updatingStatus === doc.codigo;
 
                       return (
@@ -383,8 +382,8 @@ export default function DashboardPage() {
                                 doc.tipo === "certificado"
                                   ? "bg-success/10 text-success border-success/20"
                                   : doc.tipo === "documento"
-                                  ? "bg-primary/10 text-primary border-primary/20"
-                                  : "bg-info/10 text-info border-info/20"
+                                    ? "bg-primary/10 text-primary border-primary/20"
+                                    : "bg-info/10 text-info border-info/20"
                               }
                             >
                               {doc.tipo === "certificado" ? "Certificado" : doc.tipo === "documento" ? "Documento" : "Afiliado"}
@@ -399,10 +398,10 @@ export default function DashboardPage() {
                             {doc.tipo === "afiliado" ? (
                               <button
                                 onClick={() => handleToggleEstado(doc.codigo, doc.estado)}
-                                disabled={cargando || isExpired}
+                                disabled={cargando}
                                 className={`
                                   inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                                  border transition-colors ${isExpired ? 'opacity-50 cursor-not-allowed' : 'disabled:opacity-50 disabled:cursor-not-allowed'}
+                                  border transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                                   ${esActivo
                                     ? "bg-success/10 text-success border-success/30 hover:bg-success/20"
                                     : "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20"
@@ -416,7 +415,7 @@ export default function DashboardPage() {
                                 ) : (
                                   <ToggleLeft className="h-3.5 w-3.5" />
                                 )}
-                                {isExpired ? "Vencido" : (esActivo ? "Activo" : "Inactivo")}
+                                {esActivo ? "Activo" : "Inactivo"}
                               </button>
                             ) : (
                               <div
