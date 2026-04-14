@@ -31,14 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Empty } from "@/components/ui/empty";
@@ -56,15 +48,11 @@ import {
   FileText,
   ToggleLeft,
   ToggleRight,
-  Info,
-  Calendar as CalendarIcon,
-  IdCard,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import QRCode from "qrcode";
 
-const VERIFICACION_BASE_URL = "https://sistema-verificacion.vercel.app/verificar?doc=";
+const VERIFICACION_BASE_URL = "https://sistemainstitucional.vercel.app/verificar?doc=";
 
 // Función auxiliar para dar formato legible a la fecha (por ejemplo: "22 oct 2023, 14:30")
 function formatearFecha(fecha) {
@@ -84,7 +72,7 @@ function exportarCSV(lista, nombre) {
     toast.error("No hay datos para exportar");
     return;
   }
-  const encabezados = ["Código", "Nombre", "NUIP", "Tipo", "Detalle", "Estado", "Fecha"];
+  const encabezados = ["Código", "Nombre", "Cédula", "Tipo", "Detalle", "Estado", "Fecha"];
   const filas = lista.map((item) => {
     let detalle = "Miembro";
     if (item.tipo === "certificado") {
@@ -106,22 +94,18 @@ function exportarCSV(lista, nombre) {
 // Función asíncrona para generar un código QR y forzar su descarga como imagen PNG
 async function descargarQR(codigo) {
   const link = VERIFICACION_BASE_URL + codigo;
+  const urlQR = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}`;
   try {
-    const qrDataUrl = await QRCode.toDataURL(link, {
-      width: 200,
-      margin: 2,
-      color: {
-        dark: "#1e3a5f",
-        light: "#ffffff",
-      },
-    });
-
+    const res = await fetch(urlQR);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = qrDataUrl;
+    a.href = url;
     a.download = `QR_${codigo}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    URL.revokeObjectURL(url);
     toast.success("QR descargado");
   } catch {
     toast.error("Error al descargar QR");
@@ -138,29 +122,6 @@ export default function DashboardPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroTipo, setFiltroTipo] = useState("todos");
   const [codigoAEliminar, setCodigoAEliminar] = useState(null);
-  const [infoDoc, setInfoDoc] = useState(null);
-  const [confirmarInactivacion, setConfirmarInactivacion] = useState(null);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const expirationDates = useMemo(() => {
-    return documentos
-      .filter((d) => d.tipo === "afiliado" && d.fechaExpiracion)
-      .map((d) => new Date(d.fechaExpiracion));
-  }, [documentos]);
-
-  const expiringOnSelectedDate = useMemo(() => {
-    if (!selectedDate || !documentos) return [];
-    return documentos.filter((doc) => {
-      if (doc.tipo !== "afiliado" || !doc.fechaExpiracion) return false;
-      const docDate = new Date(doc.fechaExpiracion);
-      return (
-        docDate.getDate() === selectedDate.getDate() &&
-        docDate.getMonth() === selectedDate.getMonth() &&
-        docDate.getFullYear() === selectedDate.getFullYear()
-      );
-    });
-  }, [selectedDate, documentos]);
 
   // Hook useMemo para filtrar documentos de acuerdo a las opciones de búsqueda y tipo seleccionadas. 
   // Esto previene que se re-genere si cambian otras cosas.
@@ -208,7 +169,7 @@ export default function DashboardPage() {
     const nuevoEstado = estadoActual === "activo" ? "inactivo" : "activo";
     setUpdatingStatus(codigo);
     try {
-      await actualizarEstado(codigo, nuevoEstado, nuevoEstado === "activo" ? { desactivadoManualmente: null, fechaDesactivacion: null } : {});
+      await actualizarEstado(codigo, nuevoEstado);
       toast.success(nuevoEstado === "activo" ? "Documento activado" : "Documento desactivado");
     } catch {
       toast.error("Error al cambiar estado");
@@ -343,7 +304,7 @@ export default function DashboardPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Buscar por nombre, código o NUIP..."
+                    placeholder="Buscar por nombre, código o cédula..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     className="pl-10"
@@ -362,18 +323,12 @@ export default function DashboardPage() {
                 </Select>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" onClick={() => setShowCalendar(true)}>
-                  <CalendarIcon className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Calendario</span>
-                </Button>
-                <Button asChild>
-                  <Link href="/generar">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Agregar
-                  </Link>
-                </Button>
-              </div>
+              <Button asChild>
+                <Link href="/generar">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -412,8 +367,7 @@ export default function DashboardPage() {
                   </TableHeader>
                   <TableBody>
                     {documentosFiltrados.map((doc) => {
-                      const isExpired = doc.tipo === "afiliado" && doc.fechaExpiracion && new Date() > new Date(doc.fechaExpiracion);
-                      const esActivo = doc.estado === "activo" && !isExpired;
+                      const esActivo = doc.estado === "activo";
                       const cargando = updatingStatus === doc.codigo;
 
                       return (
@@ -443,17 +397,11 @@ export default function DashboardPage() {
                           <TableCell className="hidden sm:table-cell">
                             {doc.tipo === "afiliado" ? (
                               <button
-                                onClick={() => {
-                                  if (esActivo) {
-                                    setConfirmarInactivacion(doc);
-                                  } else {
-                                    handleToggleEstado(doc.codigo, doc.estado);
-                                  }
-                                }}
-                                disabled={cargando || isExpired}
+                                onClick={() => handleToggleEstado(doc.codigo, doc.estado)}
+                                disabled={cargando}
                                 className={`
                                   inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-                                  border transition-colors ${isExpired ? 'opacity-50 cursor-not-allowed' : 'disabled:opacity-50 disabled:cursor-not-allowed'}
+                                  border transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                                   ${esActivo
                                     ? "bg-success/10 text-success border-success/30 hover:bg-success/20"
                                     : "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20"
@@ -467,7 +415,7 @@ export default function DashboardPage() {
                                 ) : (
                                   <ToggleLeft className="h-3.5 w-3.5" />
                                 )}
-                                {isExpired ? "Vencido" : (esActivo ? "Activo" : "Inactivo")}
+                                {esActivo ? "Activo" : "Inactivo"}
                               </button>
                             ) : (
                               <div
@@ -488,17 +436,6 @@ export default function DashboardPage() {
 
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
-                              {doc.tipo === "afiliado" && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-info hover:text-info"
-                                  title="Información"
-                                  onClick={() => setInfoDoc(doc)}
-                                >
-                                  <Info className="h-4 w-4" />
-                                </Button>
-                              )}
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -550,143 +487,6 @@ export default function DashboardPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Modal de información de afiliación */}
-      <Dialog open={!!infoDoc} onOpenChange={(open) => !open && setInfoDoc(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Información de Afiliación</DialogTitle>
-            <DialogDescription>
-              Detalles sobre el tiempo de afiliación de <span className="font-semibold text-foreground">{infoDoc?.nombre}</span>.
-            </DialogDescription>
-          </DialogHeader>
-          {infoDoc && (
-            <div className="space-y-4 pt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1 bg-muted/50 p-3 rounded-lg border">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Fecha de Afiliación</p>
-                  <p className="font-medium text-sm">{formatearFecha(infoDoc.fecha)}</p>
-                </div>
-                <div className="space-y-1 bg-muted/50 p-3 rounded-lg border">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Tipo (Duración)</p>
-                  <p className="font-medium text-sm">{infoDoc.duracion === "6_meses" ? "6 Meses" : infoDoc.duracion === "1_ano" ? "1 Año" : "No especificada"}</p>
-                </div>
-                <div className="space-y-1 bg-muted/50 p-3 rounded-lg border col-span-2 text-center mt-2">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Fecha de Expiración</p>
-                  <p className={`font-medium text-base ${infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion) ? 'text-destructive' : 'text-success'}`}>
-                    {formatearFecha(infoDoc.fechaExpiracion) || 'Permanente'}
-                  </p>
-                </div>
-                {infoDoc.desactivadoManualmente && (
-                  <div className="space-y-1 bg-destructive/10 p-3 rounded-lg border border-destructive/20 col-span-2 text-center mt-2">
-                    <p className="text-xs text-destructive uppercase font-semibold">Desactivado Manualmente</p>
-                    <p className="font-medium text-sm text-destructive">
-                      {formatearFecha(infoDoc.fechaDesactivacion)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal de confirmación para inactivar manualmente */}
-      <AlertDialog open={!!confirmarInactivacion} onOpenChange={(open) => !open && setConfirmarInactivacion(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Desea inactivar manualmente?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás a punto de inactivar a <span className="font-semibold text-foreground">{confirmarInactivacion?.nombre}</span> de forma manual antes de su fecha de expiración. ¿Deseas continuar?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (confirmarInactivacion) {
-                  setUpdatingStatus(confirmarInactivacion.codigo);
-                  actualizarEstado(confirmarInactivacion.codigo, "inactivo", {
-                    desactivadoManualmente: true,
-                    fechaDesactivacion: new Date().toISOString(),
-                  }).then(() => {
-                    toast.success("Documento desactivado manualmente");
-                    setUpdatingStatus(null);
-                    setConfirmarInactivacion(null);
-                  }).catch(() => {
-                    toast.error("Error al inactivar");
-                    setUpdatingStatus(null);
-                    setConfirmarInactivacion(null);
-                  });
-                }
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Inactivar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Modal de Calendario de Expiraciones */}
-      <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Calendario de Vencimientos</DialogTitle>
-            <DialogDescription>
-              Seleccione un día para ver los afiliados que expiran en esa fecha. Los días destacados indican expiraciones.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col lg:flex-row gap-6 mt-4">
-            <div className="bg-muted/30 p-2 rounded-xl flex justify-center border w-fit mx-auto lg:mx-0">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(day) => day && setSelectedDate(day)}
-                modifiers={{ expirations: expirationDates }}
-                modifiersClassNames={{ expirations: "bg-destructive/20 text-destructive font-bold rounded-md" }}
-              />
-            </div>
-            <div className="flex-1 bg-card rounded-xl border flex flex-col overflow-hidden">
-              <div className="bg-muted/50 p-4 border-b">
-                <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
-                  <CalendarIcon className="h-5 w-5" />
-                  {selectedDate.toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric" })}
-                </h3>
-              </div>
-              <div className="p-4 flex-1">
-                {expiringOnSelectedDate.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full min-h-[200px] text-muted-foreground gap-3">
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                      <CalendarIcon className="h-6 w-6 opacity-50" />
-                    </div>
-                    <p className="text-sm">No hay afiliados que expiren en este día.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                    {expiringOnSelectedDate.map((doc) => (
-                      <div key={doc.codigo} className="bg-background hover:bg-muted/30 transition-colors p-4 rounded-lg border group relative">
-                        <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3">
-                          <div>
-                            <p className="font-semibold text-base mb-1">{doc.nombre}</p>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
-                              <span className="flex items-center gap-1"><IdCard className="h-3.5 w-3.5" /> {doc.cedula}</span>
-                              <span className="flex items-center gap-1"><QrCode className="h-3.5 w-3.5" /> {doc.codigo}</span>
-                            </div>
-                          </div>
-                          <Badge variant={doc.estado === "inactivo" || (doc.fechaExpiracion && new Date() > new Date(doc.fechaExpiracion)) ? "destructive" : "default"} className="w-fit shrink-0 shadow-sm">
-                            {(doc.estado === "inactivo" || (doc.fechaExpiracion && new Date() > new Date(doc.fechaExpiracion))) ? "Vencido / Inactivo" : "Por expirar"}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
