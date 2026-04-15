@@ -52,7 +52,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-const VERIFICACION_BASE_URL = "https://sistema-verificacion.vercel.app/verificar?doc=";;
+const VERIFICACION_BASE_URL = "https://sistema-verificacion.vercel.app/verificar?doc=";
 
 // Función auxiliar para dar formato legible a la fecha (por ejemplo: "22 oct 2023, 14:30")
 function formatearFecha(fecha) {
@@ -91,21 +91,25 @@ function exportarCSV(lista, nombre) {
   toast.success(`Exportado: ${nombre}.csv`);
 }
 
-// Función asíncrona para generar un código QR y forzar su descarga como imagen PNG
+// Función asíncrona para generar un código QR con el mismo estilo que /generar y descargarlo como PNG
 async function descargarQR(codigo) {
   const link = VERIFICACION_BASE_URL + codigo;
-  const urlQR = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}`;
   try {
-    const res = await fetch(urlQR);
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+    const QRCode = (await import("qrcode")).default;
+    const qrDataUrl = await QRCode.toDataURL(link, {
+      width: 400,
+      margin: 2,
+      color: {
+        dark: "#1e3a5f",
+        light: "#ffffff",
+      },
+    });
     const a = document.createElement("a");
-    a.href = url;
+    a.href = qrDataUrl;
     a.download = `QR_${codigo}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
     toast.success("QR descargado");
   } catch {
     toast.error("Error al descargar QR");
@@ -439,7 +443,7 @@ export default function DashboardPage() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => descargarQR(doc.codigo)}
+                                onClick={() => descargarQR(doc)}
                                 title="Descargar QR"
                               >
                                 <QrCode className="h-4 w-4" />
