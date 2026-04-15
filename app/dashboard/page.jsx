@@ -142,6 +142,9 @@ export default function DashboardPage() {
   const [confirmarInactivacion, setConfirmarInactivacion] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [reactivarDoc, setReactivarDoc] = useState(null);
+  const [duracionReactivacion, setDuracionReactivacion] = useState("6_meses");
+  const [periodosExpandidos, setPeriodosExpandidos] = useState({});
 
   // Hook useMemo para filtrar documentos de acuerdo a las opciones de búsqueda y tipo seleccionadas. 
   // Esto previene que se re-genere si cambian otras cosas.
@@ -233,6 +236,46 @@ export default function DashboardPage() {
     } finally {
       setUpdatingStatus(null);
       setConfirmarInactivacion(null);
+    }
+  };
+
+  // Reactivar afiliado vencido: archiva el periodo anterior y crea uno nuevo
+  const handleReactivar = async () => {
+    if (!reactivarDoc || !duracionReactivacion) return;
+    setUpdatingStatus(reactivarDoc.codigo);
+    try {
+      const ahora = new Date();
+      const nuevaExpiracion = new Date(ahora);
+      if (duracionReactivacion === "6_meses") {
+        nuevaExpiracion.setMonth(nuevaExpiracion.getMonth() + 6);
+      } else {
+        nuevaExpiracion.setFullYear(nuevaExpiracion.getFullYear() + 1);
+      }
+      // Construir el periodo anterior para agregar al historial
+      const periodoAnterior = {
+        inicio: reactivarDoc.fechaInicioPeriodo || reactivarDoc.fecha,
+        fin: reactivarDoc.fechaExpiracion,
+        duracion: reactivarDoc.duracion,
+        tipo: (reactivarDoc.periodos?.length ?? 0) === 0 ? "registro" : "renovacion",
+      };
+      const periodosAnteriores = Array.isArray(reactivarDoc.periodos)
+        ? [...reactivarDoc.periodos, periodoAnterior]
+        : [periodoAnterior];
+      await actualizarEstado(reactivarDoc.codigo, "activo", {
+        duracion: duracionReactivacion,
+        fechaExpiracion: nuevaExpiracion.toISOString(),
+        fechaInicioPeriodo: ahora.toISOString(),
+        desactivadoManualmente: null,
+        fechaDesactivacion: null,
+        periodos: periodosAnteriores,
+      });
+      toast.success("Afiliado reactivado exitosamente");
+    } catch {
+      toast.error("Error al reactivar el afiliado");
+    } finally {
+      setUpdatingStatus(null);
+      setReactivarDoc(null);
+      setDuracionReactivacion("6_meses");
     }
   };
 
@@ -463,18 +506,21 @@ export default function DashboardPage() {
                             {doc.tipo === "afiliado" ? (
                               <button
                                 onClick={() => {
-                                  if (esActivo) {
+                                  if (isExpired) {
+                                    setReactivarDoc(doc);
+                                    setDuracionReactivacion("6_meses");
+                                  } else if (esActivo) {
                                     setConfirmarInactivacion(doc);
                                   } else {
                                     handleToggleEstado(doc.codigo, doc.estado);
                                   }
                                 }}
-                                disabled={cargando || isExpired}
+                                disabled={cargando}
                                 className={`
                                   inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
                                   border transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                                   ${isExpired
-                                    ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                    ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20"
                                     : esActivo
                                       ? "bg-success/10 text-success border-success/30 hover:bg-success/20"
                                       : "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20"
@@ -590,9 +636,65 @@ export default function DashboardPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Modal de información de afiliación */}
-      <Dialog open={!!infoDoc} onOpenChange={(open) => !open && setInfoDoc(null)}>
+      {/* Diálogo de reactivación de afiliado vencido */}
+      <Dialog open={!!reactivarDoc} onOpenChange={(open) => !open && setReactivarDoc(null)}>
         <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reactivar Afiliado</DialogTitle>
+            <DialogDescription>
+              Selecciona la nueva duración de afiliación para{" "}
+              <span className="font-semibold text-foreground">{reactivarDoc?.nombre}</span>.
+              El periodo anterior quedará guardado en el historial.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setDuracionReactivacion("6_meses")}
+                className={`p-4 rounded-xl border-2 text-center transition-all ${
+                  duracionReactivacion === "6_meses"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-muted hover:border-primary/40"
+                }`}
+              >
+                <p className="text-2xl font-bold">6</p>
+                <p className="text-sm font-medium">Meses</p>
+              </button>
+              <button
+                onClick={() => setDuracionReactivacion("1_ano")}
+                className={`p-4 rounded-xl border-2 text-center transition-all ${
+                  duracionReactivacion === "1_ano"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-muted hover:border-primary/40"
+                }`}
+              >
+                <p className="text-2xl font-bold">1</p>
+                <p className="text-sm font-medium">Año</p>
+              </button>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" className="flex-1" onClick={() => setReactivarDoc(null)}>
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1"
+                disabled={updatingStatus === reactivarDoc?.codigo}
+                onClick={handleReactivar}
+              >
+                {updatingStatus === reactivarDoc?.codigo ? (
+                  <><Spinner className="mr-2" /> Reactivando...</>
+                ) : (
+                  "Confirmar Reactivación"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de información de afiliación con historial de periodos */}
+      <Dialog open={!!infoDoc} onOpenChange={(open) => !open && setInfoDoc(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Información de Afiliación</DialogTitle>
             <DialogDescription>
@@ -602,28 +704,33 @@ export default function DashboardPage() {
           </DialogHeader>
           {infoDoc && (
             <div className="space-y-3 pt-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/50 p-3 rounded-lg border space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Fecha de Afiliación</p>
-                  <p className="font-medium text-sm">{formatearFecha(infoDoc.fecha)}</p>
+              {/* Periodo actual */}
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-3">
+                <p className="text-xs text-primary uppercase font-bold tracking-wider">Periodo Actual</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-background p-3 rounded-lg border space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase font-semibold">Inicio</p>
+                    <p className="font-medium text-sm">{formatearFecha(infoDoc.fechaInicioPeriodo || infoDoc.fecha)}</p>
+                  </div>
+                  <div className="bg-background p-3 rounded-lg border space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase font-semibold">Duración</p>
+                    <p className="font-medium text-sm">
+                      {infoDoc.duracion === "6_meses" ? "6 Meses" : infoDoc.duracion === "1_ano" ? "1 Año" : "No especificada"}
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-muted/50 p-3 rounded-lg border space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Duración</p>
-                  <p className="font-medium text-sm">
-                    {infoDoc.duracion === "6_meses" ? "6 Meses" : infoDoc.duracion === "1_ano" ? "1 Año" : "No especificada"}
+                <div className="bg-background p-3 rounded-lg border text-center space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Expira</p>
+                  <p className={`font-semibold text-base ${
+                    infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion)
+                      ? "text-destructive" : "text-success"
+                  }`}>
+                    {infoDoc.fechaExpiracion ? formatearFecha(infoDoc.fechaExpiracion) : "Sin expiración"}
                   </p>
                 </div>
               </div>
-              <div className="bg-muted/50 p-3 rounded-lg border text-center space-y-1">
-                <p className="text-xs text-muted-foreground uppercase font-semibold">Fecha de Expiración</p>
-                <p className={`font-semibold text-base ${
-                  infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion)
-                    ? "text-destructive"
-                    : "text-success"
-                }`}>
-                  {infoDoc.fechaExpiracion ? formatearFecha(infoDoc.fechaExpiracion) : "Sin expiración"}
-                </p>
-              </div>
+
+              {/* NUIP */}
               <div className="bg-muted/50 p-3 rounded-lg border flex items-center gap-3">
                 <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                 <div>
@@ -631,10 +738,55 @@ export default function DashboardPage() {
                   <p className="font-medium text-sm font-mono">{infoDoc.cedula || "-"}</p>
                 </div>
               </div>
+
+              {/* Desactivado manualmente */}
               {infoDoc.desactivadoManualmente && (
                 <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-lg space-y-1">
                   <p className="text-xs text-destructive uppercase font-semibold">Desactivado Manualmente</p>
                   <p className="font-medium text-sm text-destructive">{formatearFecha(infoDoc.fechaDesactivacion)}</p>
+                </div>
+              )}
+
+              {/* Historial de periodos anteriores */}
+              {Array.isArray(infoDoc.periodos) && infoDoc.periodos.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider pt-1">Historial de Periodos</p>
+                  {[...infoDoc.periodos].reverse().map((periodo, idx) => {
+                    const key = `${infoDoc.codigo}-${idx}`;
+                    const expandido = periodosExpandidos[key];
+                    const numero = infoDoc.periodos.length - idx;
+                    return (
+                      <div key={key} className="border rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => setPeriodosExpandidos((prev) => ({ ...prev, [key]: !prev[key] }))}
+                          className="w-full flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs bg-muted text-muted-foreground rounded-full px-2 py-0.5 font-mono">#{numero}</span>
+                            <span className="text-sm font-medium">
+                              {periodo.tipo === "registro" ? "Registro Inicial" : `Renovación`}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              — {periodo.duracion === "6_meses" ? "6 Meses" : "1 Año"}
+                            </span>
+                          </div>
+                          <span className="text-muted-foreground text-xs">{expandido ? "▲" : "▼"}</span>
+                        </button>
+                        {expandido && (
+                          <div className="p-3 grid grid-cols-2 gap-3 bg-background">
+                            <div className="space-y-1">
+                              <p className="text-xs text-muted-foreground uppercase font-semibold">Inicio</p>
+                              <p className="text-sm font-medium">{formatearFecha(periodo.inicio)}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-xs text-muted-foreground uppercase font-semibold">Fin</p>
+                              <p className="text-sm font-medium text-destructive">{formatearFecha(periodo.fin)}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
