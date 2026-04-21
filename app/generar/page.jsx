@@ -361,6 +361,7 @@ export default function GenerarPage() {
                     <SelectContent>
                       {formData.oficina === "Sede Principal" ? (
                         <>
+                          <SelectItem value="Representante Legal">Representante Legal</SelectItem>
                           <SelectItem value="Dirección ejecutiva">Dirección Ejecutiva</SelectItem>
                           <SelectItem value="Dirección administrativa">Dirección Administrativa</SelectItem>
                           <SelectItem value="Revisaría fiscal">Revisaría Fiscal</SelectItem>
