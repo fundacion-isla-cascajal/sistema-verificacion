@@ -651,22 +651,20 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setDuracionReactivacion("6_meses")}
-                className={`p-4 rounded-xl border-2 text-center transition-all ${
-                  duracionReactivacion === "6_meses"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-muted hover:border-primary/40"
-                }`}
+                className={`p-4 rounded-xl border-2 text-center transition-all ${duracionReactivacion === "6_meses"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-muted hover:border-primary/40"
+                  }`}
               >
                 <p className="text-2xl font-bold">6</p>
                 <p className="text-sm font-medium">Meses</p>
               </button>
               <button
                 onClick={() => setDuracionReactivacion("1_ano")}
-                className={`p-4 rounded-xl border-2 text-center transition-all ${
-                  duracionReactivacion === "1_ano"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-muted hover:border-primary/40"
-                }`}
+                className={`p-4 rounded-xl border-2 text-center transition-all ${duracionReactivacion === "1_ano"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-muted hover:border-primary/40"
+                  }`}
               >
                 <p className="text-2xl font-bold">1</p>
                 <p className="text-sm font-medium">Año</p>
@@ -721,10 +719,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="bg-background p-3 rounded-lg border text-center space-y-1">
                   <p className="text-xs text-muted-foreground uppercase font-semibold">Expira</p>
-                  <p className={`font-semibold text-base ${
-                    infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion)
-                      ? "text-destructive" : "text-success"
-                  }`}>
+                  <p className={`font-semibold text-base ${infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion)
+                    ? "text-destructive" : "text-success"
+                    }`}>
                     {infoDoc.fechaExpiracion ? formatearFecha(infoDoc.fechaExpiracion) : "Sin expiración"}
                   </p>
                 </div>

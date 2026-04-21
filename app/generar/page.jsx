@@ -45,6 +45,10 @@ export default function GenerarPage() {
     evento: "",
     descripcion: "",
     duracion: "",
+    fecha: (() => {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    })(),
   });
   const [isCreating, setIsCreating] = useState(false);
   const [documentoCreado, setDocumentoCreado] = useState(null);
@@ -58,7 +62,7 @@ export default function GenerarPage() {
   };
 
   const isFormValid = () => {
-    if (!formData.nombre || !formData.cedula || !formData.tipo) return false;
+    if (!formData.nombre || !formData.cedula || !formData.tipo || !formData.fecha) return false;
     if (formData.tipo === "certificado" && !formData.evento) return false;
     if (formData.tipo === "afiliado" && !formData.duracion) return false;
     return true;
@@ -100,7 +104,15 @@ export default function GenerarPage() {
       const codigo = generarCodigo();
       const link = VERIFICACION_BASE_URL + codigo;
 
-      const fechaCreacion = new Date();
+      let fechaCreacion = new Date();
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      
+      if (formData.fecha && formData.fecha !== todayStr) {
+        const [year, month, day] = formData.fecha.split('-');
+        fechaCreacion = new Date(year, month - 1, day, 12, 0, 0);
+      }
+
       let fechaExpiracion = null;
 
       if (formData.tipo === "afiliado" && formData.duracion) {
@@ -155,7 +167,9 @@ export default function GenerarPage() {
   };
 
   const handleNuevoDocumento = () => {
-    setFormData({ nombre: "", cedula: "", tipo: "", evento: "", descripcion: "", duracion: "" });
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    setFormData({ nombre: "", cedula: "", tipo: "", evento: "", descripcion: "", duracion: "", fecha: todayStr });
     setDocumentoCreado(null);
     setMostrarPreview(false);
   };
@@ -270,6 +284,33 @@ export default function GenerarPage() {
                       onChange={(e) => handleInputChange("cedula", e.target.value)}
                       className="pl-10"
                     />
+                  </div>
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="fecha">Fecha de emisión</FieldLabel>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="fecha"
+                        type="date"
+                        value={formData.fecha}
+                        onChange={(e) => handleInputChange("fecha", e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => {
+                        const now = new Date();
+                        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                        handleInputChange("fecha", todayStr);
+                      }}
+                    >
+                      Hoy
+                    </Button>
                   </div>
                 </Field>
 
@@ -390,6 +431,14 @@ export default function GenerarPage() {
                     <div className="flex items-center gap-3">
                       <IdCard className="h-4 w-4 text-muted-foreground" />
                       <span>{formData.cedula}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span>{(() => {
+                        if (!formData.fecha) return "";
+                        const [y, m, d] = formData.fecha.split("-");
+                        return `${d}/${m}/${y}`;
+                      })()}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Award className="h-4 w-4 text-muted-foreground" />
