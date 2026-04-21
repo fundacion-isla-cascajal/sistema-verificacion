@@ -550,17 +550,15 @@ export default function DashboardPage() {
 
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
-                              {doc.tipo === "afiliado" && (
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   className="text-info hover:text-info"
-                                  title="Información de afiliación"
+                                  title="Información"
                                   onClick={() => setInfoDoc(doc)}
                                 >
                                   <Info className="h-4 w-4" />
                                 </Button>
-                              )}
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -694,16 +692,17 @@ export default function DashboardPage() {
       <Dialog open={!!infoDoc} onOpenChange={(open) => !open && setInfoDoc(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Información de Afiliación</DialogTitle>
+            <DialogTitle>Información del Documento</DialogTitle>
             <DialogDescription>
-              Detalles de la afiliación de{" "}
+              Detalles del registro de{" "}
               <span className="font-semibold text-foreground">{infoDoc?.nombre}</span>.
             </DialogDescription>
           </DialogHeader>
           {infoDoc && (
             <div className="space-y-3 pt-2">
-              {/* Periodo actual */}
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-3">
+              {/* Periodo actual solo para afiliados */}
+              {infoDoc.tipo === "afiliado" && (
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-3">
                 <p className="text-xs text-primary uppercase font-bold tracking-wider">Periodo Actual</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-background p-3 rounded-lg border space-y-1">
@@ -726,6 +725,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
+              )}
 
               {/* NUIP */}
               <div className="bg-muted/50 p-3 rounded-lg border flex items-center gap-3">
@@ -735,6 +735,25 @@ export default function DashboardPage() {
                   <p className="font-medium text-sm font-mono">{infoDoc.cedula || "-"}</p>
                 </div>
               </div>
+
+              {/* Emisión (Oficina y Dependencia) */}
+              {(infoDoc.oficina || infoDoc.dependencia) && (
+                <div className="bg-muted/30 p-3 rounded-lg border space-y-2">
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Emisión</p>
+                  {infoDoc.oficina && (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary shrink-0" />
+                      <p className="text-sm font-medium">{infoDoc.oficina}</p>
+                    </div>
+                  )}
+                  {infoDoc.dependencia && (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary shrink-0" />
+                      <p className="text-sm font-medium text-muted-foreground">{infoDoc.dependencia}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Desactivado manualmente */}
               {infoDoc.desactivadoManualmente && (

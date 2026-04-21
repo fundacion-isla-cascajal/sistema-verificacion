@@ -45,6 +45,8 @@ export default function GenerarPage() {
     evento: "",
     descripcion: "",
     duracion: "",
+    oficina: "",
+    dependencia: "",
     fecha: (() => {
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -62,7 +64,7 @@ export default function GenerarPage() {
   };
 
   const isFormValid = () => {
-    if (!formData.nombre || !formData.cedula || !formData.tipo || !formData.fecha) return false;
+    if (!formData.nombre || !formData.cedula || !formData.tipo || !formData.fecha || !formData.oficina || !formData.dependencia) return false;
     if (formData.tipo === "certificado" && !formData.evento) return false;
     if (formData.tipo === "afiliado" && !formData.duracion) return false;
     return true;
@@ -128,6 +130,8 @@ export default function GenerarPage() {
         nombre: formData.nombre.trim(),
         cedula: formData.cedula.trim(),
         tipo: formData.tipo,
+        oficina: formData.oficina,
+        dependencia: formData.dependencia,
         evento: formData.tipo === "certificado" ? formData.evento : null,
         descripcion: (formData.tipo === "certificado" || formData.tipo === "documento") ? formData.descripcion.trim() : null,
         duracion: formData.tipo === "afiliado" ? formData.duracion : null,
@@ -169,7 +173,7 @@ export default function GenerarPage() {
   const handleNuevoDocumento = () => {
     const now = new Date();
     const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    setFormData({ nombre: "", cedula: "", tipo: "", evento: "", descripcion: "", duracion: "", fecha: todayStr });
+    setFormData({ nombre: "", cedula: "", tipo: "", evento: "", descripcion: "", duracion: "", fecha: todayStr, oficina: "", dependencia: "" });
     setDocumentoCreado(null);
     setMostrarPreview(false);
   };
@@ -331,6 +335,63 @@ export default function GenerarPage() {
                   </Select>
                 </Field>
 
+                <Field>
+                  <FieldLabel htmlFor="oficina">Oficina que emite</FieldLabel>
+                  <Select
+                    value={formData.oficina}
+                    onValueChange={(value) => handleInputChange("oficina", value)}
+                  >
+                    <SelectTrigger id="oficina">
+                      <SelectValue placeholder="Seleccione la oficina" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Sede Principal">Sede Principal</SelectItem>
+                      <SelectItem value="Subdirección Regional Pacífico Norte">Subdirección Regional Pacífico Norte</SelectItem>
+                      <SelectItem value="Subdirección Regional Pacífico Sur">Subdirección Regional Pacífico Sur</SelectItem>
+                      <SelectItem value="Subdirección Regional Eje Cafetero">Subdirección Regional Eje Cafetero</SelectItem>
+                      <SelectItem value="Subdirección Regional Sur Central">Subdirección Regional Sur Central</SelectItem>
+                      <SelectItem value="Subdirección Regional Nor Caribe">Subdirección Regional Nor Caribe</SelectItem>
+                      <SelectItem value="Subdirección Regional Sur Caribe">Subdirección Regional Sur Caribe</SelectItem>
+                      <SelectItem value="Subdirección Regional Nor Oriente">Subdirección Regional Nor Oriente</SelectItem>
+                      <SelectItem value="Subdirección Regional Sur Oriente">Subdirección Regional Sur Oriente</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="dependencia">Dependencia que emite</FieldLabel>
+                  <Select
+                    value={formData.dependencia}
+                    onValueChange={(value) => handleInputChange("dependencia", value)}
+                  >
+                    <SelectTrigger id="dependencia">
+                      <SelectValue placeholder="Seleccione la dependencia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dirección Ejecutiva">Dirección Ejecutiva</SelectItem>
+                      <SelectItem value="Dirección Administrativa">Dirección Administrativa</SelectItem>
+                      <SelectItem value="Revisaría Fiscal">Revisaría Fiscal</SelectItem>
+                      <SelectItem value="Secretaría General">Secretaría General</SelectItem>
+                      <SelectItem value="Subdirección de Áreas">Subdirección de Áreas</SelectItem>
+                      <SelectItem value="Subdirección de Turismo, Las Artes, Las Culturas y Los Saberes">Subdirección de Turismo, Las Artes, Las Culturas y Los Saberes</SelectItem>
+                      <SelectItem value="Subdirección de Extensión Y Cosmovisión Etnoeducativa">Subdirección de Extensión Y Cosmovisión Etnoeducativa</SelectItem>
+                      <SelectItem value="Subdirección de Recreación, Deporte, Salud y Ambiente Saludable">Subdirección de Recreación, Deporte, Salud y Ambiente Saludable</SelectItem>
+                      <SelectItem value="Subdirección de Bienestar Social, Inclusión y Equidad">Subdirección de Bienestar Social, Inclusión y Equidad</SelectItem>
+                      <SelectItem value="Coordinación Jurídica">Coordinación Jurídica</SelectItem>
+                      <SelectItem value="Coordinación Comercial">Coordinación Comercial</SelectItem>
+                      <SelectItem value="Coordinación de Planeación y Calidad">Coordinación de Planeación y Calidad</SelectItem>
+                      <SelectItem value="Coordinación de Proyectos e Internacionalización">Coordinación de Proyectos e Internacionalización</SelectItem>
+                      <SelectItem value="Coordinación de Operaciones Financieras">Coordinación de Operaciones Financieras</SelectItem>
+                      <SelectItem value="Coordinación del Talento Humano">Coordinación del Talento Humano</SelectItem>
+                      <SelectItem value="Coordinación de Comunicaciones y Canales Digitales">Coordinación de Comunicaciones y Canales Digitales</SelectItem>
+                      <SelectItem value="Área de Operaciones Logísticas">Área de Operaciones Logísticas</SelectItem>
+                      <SelectItem value="Área de Tesorería">Área de Tesorería</SelectItem>
+                      <SelectItem value="Área de Contabilidad">Área de Contabilidad</SelectItem>
+                      <SelectItem value="Área de Práctica y Pasantías">Área de Práctica y Pasantías</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+
                 {formData.tipo === "afiliado" && (
                   <Field>
                     <FieldLabel htmlFor="duracion">Duración de afiliación</FieldLabel>
@@ -471,6 +532,18 @@ export default function GenerarPage() {
                       <div className="flex items-center gap-3">
                         <FileCheck className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">{formData.descripcion}</span>
+                      </div>
+                    )}
+                    {formData.oficina && (
+                      <div className="flex items-center gap-3">
+                        <Award className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Oficina: {formData.oficina}</span>
+                      </div>
+                    )}
+                    {formData.dependencia && (
+                      <div className="flex items-center gap-3">
+                        <Award className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Dependencia: {formData.dependencia}</span>
                       </div>
                     )}
                   </div>

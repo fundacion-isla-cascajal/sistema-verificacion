@@ -174,6 +174,35 @@ function VerificarContent() {
                     <p className="font-mono font-medium">{documento.codigo}</p>
                   </div>
                 </div>
+                {documento.fecha && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Fecha de Emisión</p>
+                      <p className="font-medium">
+                        {new Date(documento.fecha).toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {documento.oficina && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Oficina de Emisión</p>
+                      <p className="font-medium">{documento.oficina}</p>
+                    </div>
+                  </div>
+                )}
+                {documento.dependencia && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Dependencia</p>
+                      <p className="font-medium">{documento.dependencia}</p>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="mt-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg">
                 <p className="text-sm text-amber-600">
@@ -248,6 +277,35 @@ function VerificarContent() {
                     <div>
                       <p className="text-xs text-muted-foreground">Estado</p>
                       <p className="font-medium capitalize">{documento.estado}</p>
+                    </div>
+                  </div>
+                )}
+                {documento.fecha && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Fecha de Emisión</p>
+                      <p className="font-medium">
+                        {new Date(documento.fecha).toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {documento.oficina && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Oficina de Emisión</p>
+                      <p className="font-medium">{documento.oficina}</p>
+                    </div>
+                  </div>
+                )}
+                {documento.dependencia && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Dependencia</p>
+                      <p className="font-medium">{documento.dependencia}</p>
                     </div>
                   </div>
                 )}
