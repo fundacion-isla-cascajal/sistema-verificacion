@@ -65,6 +65,13 @@ import Image from "next/image";
 
 const VERIFICACION_BASE_URL = "https://sistema-verificacion.vercel.app/verificar?doc=";
 
+const { user, userData, empleadoData, empleadoId, loading } = useAuth();
+
+console.log("USER AUTH:", user);
+console.log("USER DATA:", userData);
+console.log("EMPLEADO DATA:", empleadoData);
+console.log("EMPLEADO ID:", empleadoId);
+
 // Función auxiliar para dar formato legible a la fecha (por ejemplo: "22 oct 2023, 14:30")
 function formatearFecha(fecha) {
   if (!fecha) return "-";
@@ -550,15 +557,15 @@ export default function DashboardPage() {
 
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-info hover:text-info"
-                                  title="Información"
-                                  onClick={() => setInfoDoc(doc)}
-                                >
-                                  <Info className="h-4 w-4" />
-                                </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-info hover:text-info"
+                                title="Información"
+                                onClick={() => setInfoDoc(doc)}
+                              >
+                                <Info className="h-4 w-4" />
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -703,28 +710,28 @@ export default function DashboardPage() {
               {/* Periodo actual solo para afiliados */}
               {infoDoc.tipo === "afiliado" && (
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-3">
-                <p className="text-xs text-primary uppercase font-bold tracking-wider">Periodo Actual</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-background p-3 rounded-lg border space-y-1">
-                    <p className="text-xs text-muted-foreground uppercase font-semibold">Inicio</p>
-                    <p className="font-medium text-sm">{formatearFecha(infoDoc.fechaInicioPeriodo || infoDoc.fecha)}</p>
+                  <p className="text-xs text-primary uppercase font-bold tracking-wider">Periodo Actual</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-background p-3 rounded-lg border space-y-1">
+                      <p className="text-xs text-muted-foreground uppercase font-semibold">Inicio</p>
+                      <p className="font-medium text-sm">{formatearFecha(infoDoc.fechaInicioPeriodo || infoDoc.fecha)}</p>
+                    </div>
+                    <div className="bg-background p-3 rounded-lg border space-y-1">
+                      <p className="text-xs text-muted-foreground uppercase font-semibold">Duración</p>
+                      <p className="font-medium text-sm">
+                        {infoDoc.duracion === "6_meses" ? "6 Meses" : infoDoc.duracion === "1_ano" ? "1 Año" : "No especificada"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-background p-3 rounded-lg border space-y-1">
-                    <p className="text-xs text-muted-foreground uppercase font-semibold">Duración</p>
-                    <p className="font-medium text-sm">
-                      {infoDoc.duracion === "6_meses" ? "6 Meses" : infoDoc.duracion === "1_ano" ? "1 Año" : "No especificada"}
+                  <div className="bg-background p-3 rounded-lg border text-center space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase font-semibold">Expira</p>
+                    <p className={`font-semibold text-base ${infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion)
+                      ? "text-destructive" : "text-success"
+                      }`}>
+                      {infoDoc.fechaExpiracion ? formatearFecha(infoDoc.fechaExpiracion) : "Sin expiración"}
                     </p>
                   </div>
                 </div>
-                <div className="bg-background p-3 rounded-lg border text-center space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Expira</p>
-                  <p className={`font-semibold text-base ${infoDoc.fechaExpiracion && new Date() > new Date(infoDoc.fechaExpiracion)
-                    ? "text-destructive" : "text-success"
-                    }`}>
-                    {infoDoc.fechaExpiracion ? formatearFecha(infoDoc.fechaExpiracion) : "Sin expiración"}
-                  </p>
-                </div>
-              </div>
               )}
 
               {/* NUIP */}
