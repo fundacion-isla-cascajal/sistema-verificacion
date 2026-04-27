@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { collection, doc, setDoc, query, where, getDocs } from "firebase/firestore";
