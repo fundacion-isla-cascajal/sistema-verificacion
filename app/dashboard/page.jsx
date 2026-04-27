@@ -1,7 +1,8 @@
 "use client";
 
-export const dynamic = "force-dynamic";
+
 import { useState, useMemo } from "react";
+export const dynamic = "force-dynamic";
 import { useAuth } from "@/hooks/use-auth";
 import { useDocumentos } from "@/hooks/use-documentos";
 import { Button } from "@/components/ui/button";
@@ -66,12 +67,7 @@ import Image from "next/image";
 
 const VERIFICACION_BASE_URL = "https://sistema-verificacion.vercel.app/verificar?doc=";
 
-const { user, userData, empleadoData, empleadoId, loading } = useAuth();
 
-console.log("USER AUTH:", user);
-console.log("USER DATA:", userData);
-console.log("EMPLEADO DATA:", empleadoData);
-console.log("EMPLEADO ID:", empleadoId);
 
 // Función auxiliar para dar formato legible a la fecha (por ejemplo: "22 oct 2023, 14:30")
 function formatearFecha(fecha) {
@@ -138,9 +134,22 @@ async function descargarQR(docObj) {
 
 // Componente Principal: Vista del panel de administración (Dashboard)
 export default function DashboardPage() {
-  // Extraemos variables de autenticación y métodos del custom hook (useAuth y useDocumentos)
-  const { user, loading: authLoading, logout } = useAuth();
+
+  const {
+    user,
+    userData,
+    empleadoData,
+    empleadoId,
+    loading: authLoading,
+    logout
+  } = useAuth();
+
   const { documentos, isLoading, eliminarDocumento, actualizarEstado } = useDocumentos();
+
+  console.log("USER AUTH:", user);
+  console.log("USER DATA:", userData);
+  console.log("EMPLEADO DATA:", empleadoData);
+  console.log("EMPLEADO ID:", empleadoId);
 
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [busqueda, setBusqueda] = useState("");
