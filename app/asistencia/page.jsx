@@ -273,8 +273,16 @@ function AsistenciaContent() {
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">Sin perfil de empleado</h2>
               <p className="text-sm text-muted-foreground px-2">
-                Tu cuenta no está vinculada a un empleado. Contacta al administrador para que complete tu registro.
+                Tu cuenta no está vinculada a un perfil administrativo. Contacta al administrador.
               </p>
+              {userData && (
+                <div className="mt-4 p-3 bg-muted rounded text-xs text-left text-muted-foreground break-all">
+                  <p><strong>Debug info:</strong></p>
+                  <p>Correo: {userData.correo}</p>
+                  <p>Rol: {userData.rol}</p>
+                  <p>EmpleadoID Vinculado: {userData.empleadoId || 'null'}</p>
+                </div>
+              )}
             </div>
             <div className="pt-2 flex flex-col gap-3">
               <Button asChild variant="default" className="w-full">
