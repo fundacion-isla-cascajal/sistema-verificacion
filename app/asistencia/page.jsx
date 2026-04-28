@@ -13,6 +13,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Image from "next/image";
+import Link from "next/link";
 import {
   LogIn, LogOut, Coffee, RotateCcw, Monitor, CheckCircle2,
   Clock, User, Wifi, WifiOff, MapPin, MapPinOff, Activity,
