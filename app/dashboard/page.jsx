@@ -202,7 +202,7 @@ function useAsistencias(fecha) {
 
 // ─── Componente Principal ─────────────────────────────────────────────────────
 
-export default function DashboardPage() {
+function DashboardContent() {
 
   const {
     user,
@@ -425,8 +425,8 @@ export default function DashboardPage() {
       <main className="container mx-auto px-4 py-6">
 
         <Tabs defaultValue="documentos">
-          {/* Pestañas — Control de Asistencia solo para superadmin */}
-          <TabsList className={`mb-6 ${esSuperAdmin ? "" : "hidden"}`}>
+          {/* Pestañas — Lógica por Rol */}
+          <TabsList className="mb-6 flex flex-wrap h-auto">
             <TabsTrigger value="documentos" className="gap-2">
               <FileText className="h-4 w-4" />
               Documentos
@@ -441,6 +441,12 @@ export default function DashboardPage() {
               <TabsTrigger value="modalidad" className="gap-2">
                 <CalendarDays className="h-4 w-4" />
                 Modalidad Laboral
+              </TabsTrigger>
+            )}
+            {esSuperAdmin && (
+              <TabsTrigger value="usuarios" className="gap-2">
+                <Users className="h-4 w-4" />
+                Gestión de Usuarios
               </TabsTrigger>
             )}
           </TabsList>
@@ -900,6 +906,45 @@ export default function DashboardPage() {
             </TabsContent>
           )}
 
+          {/* ══════════════════ PESTAÑA: GESTIÓN DE USUARIOS ══════════════════ */}
+          {esSuperAdmin && (
+            <TabsContent value="usuarios">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
+                    Gestión de Usuarios y Roles
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Crea y administra las cuentas de acceso al sistema (Superadmin, Admin, Empleado).
+                  </p>
+                </div>
+
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="pt-6 pb-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+                      <div className="space-y-1">
+                        <p className="font-semibold text-foreground flex items-center gap-2">
+                          <ShieldCheck className="h-4 w-4 text-primary" />
+                          Control de Acceso Centralizado
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Asigna correos, contraseñas y roles. Vincula automáticamente las cuentas de usuario con los perfiles de los empleados.
+                        </p>
+                      </div>
+                      <Button asChild size="lg" className="shrink-0">
+                        <Link href="/dashboard/usuarios">
+                          <Users className="h-4 w-4 mr-2" />
+                          Administrar Usuarios
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
+
         </Tabs>
 
       </main>
@@ -1197,5 +1242,13 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute allowedRoles={["superadmin", "admin"]}>
+      <DashboardContent />
+    </ProtectedRoute>
   );
 }

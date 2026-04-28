@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import ProtectedRoute from "@/components/protected-route";
 import { useEmpleados, DIAS_SEMANA, MODALIDADES, calcularResumenHorario, normalizarHorario } from "@/hooks/use-empleados";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -192,7 +193,7 @@ function TarjetaEmpleado({ empleado, onGuardar }) {
 
 // ─── página principal ─────────────────────────────────────────────────────────
 
-export default function ModalidadLaboralPage() {
+function ModalidadLaboralContent() {
   const { user, userData, loading: authLoading, logout } = useAuth();
   const { empleados, isLoading, error, recargar, actualizarModalidad } = useEmpleados();
   const [busqueda, setBusqueda] = useState("");
@@ -353,5 +354,13 @@ export default function ModalidadLaboralPage() {
         </p>
       </main>
     </div>
+  );
+}
+
+export default function ModalidadLaboralPage() {
+  return (
+    <ProtectedRoute allowedRoles={["superadmin"]}>
+      <ModalidadLaboralContent />
+    </ProtectedRoute>
   );
 }

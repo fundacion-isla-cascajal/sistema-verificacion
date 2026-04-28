@@ -31,6 +31,8 @@ export function useAuth(requireAuth = true) {
         setEmpleadoId(null);
         setLoading(false);
 
+        // La redirección aquí solo aplica para el hook base si se requiere auth
+        // Sin embargo, ProtectedRoute también maneja redirecciones más finas.
         if (requireAuth) {
           router.push("/login");
         }
@@ -46,8 +48,12 @@ export function useAuth(requireAuth = true) {
         const userRef = doc(db, "usuarios", firebaseUser.uid);
         const userSnap = await getDoc(userRef);
 
+        let empleadoIdVinculado = null;
+
         if (userSnap.exists()) {
-          setUserData(userSnap.data());
+          const ud = userSnap.data();
+          setUserData(ud);
+          empleadoIdVinculado = ud.empleadoId; // Si el usuario tiene empleadoId directo
         } else {
           setUserData(null);
         }
@@ -55,24 +61,45 @@ export function useAuth(requireAuth = true) {
         // ============================
         // BUSCAR EMPLEADO RELACIONADO
         // ============================
-        const q = query(
-          collection(db, "empleados"),
-          where("uid", "==", firebaseUser.uid)
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const empleadoDoc = querySnapshot.docs[0];
-
-          setEmpleadoId(empleadoDoc.id);
-          setEmpleadoData({
-            id: empleadoDoc.id,
-            ...empleadoDoc.data(),
-          });
+        // Si el empleadoId viene en el userData lo usamos, sino buscamos por uid
+        if (empleadoIdVinculado) {
+          const empRef = doc(db, "empleados", empleadoIdVinculado);
+          const empSnap = await getDoc(empRef);
+          if (empSnap.exists()) {
+            setEmpleadoId(empSnap.id);
+            setEmpleadoData({ id: empSnap.id, ...empSnap.data() });
+          } else {
+            setEmpleadoId(null);
+            setEmpleadoData(null);
+          }
         } else {
-          setEmpleadoId(null);
-          setEmpleadoData(null);
+          // Fallback por uidAuth o uid
+          const q = query(
+            collection(db, "empleados"),
+            where("uidAuth", "==", firebaseUser.uid)
+          );
+          let querySnapshot = await getDocs(q);
+
+          // Retrocompatibilidad con el campo "uid" anterior
+          if (querySnapshot.empty) {
+            const qOld = query(
+              collection(db, "empleados"),
+              where("uid", "==", firebaseUser.uid)
+            );
+            querySnapshot = await getDocs(qOld);
+          }
+
+          if (!querySnapshot.empty) {
+            const empleadoDoc = querySnapshot.docs[0];
+            setEmpleadoId(empleadoDoc.id);
+            setEmpleadoData({
+              id: empleadoDoc.id,
+              ...empleadoDoc.data(),
+            });
+          } else {
+            setEmpleadoId(null);
+            setEmpleadoData(null);
+          }
         }
 
       } catch (error) {

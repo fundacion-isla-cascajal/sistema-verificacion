@@ -32,7 +32,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Bienvenido al sistema");
-      router.push("/dashboard");
+      router.push("/");
     } catch {
       toast.error("Credenciales incorrectas");
     } finally {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import ProtectedRoute from "@/components/protected-route";
 import { getDiaActualES, normalizarHorario } from "@/hooks/use-empleados";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -134,7 +135,7 @@ function LineaTiempo({ registro, modalidad }) {
 
 // ─── página principal ─────────────────────────────────────────────────────────
 
-export default function AsistenciaPage() {
+function AsistenciaContent() {
   const { user, userData, empleadoData, empleadoId, loading } = useAuth();
 
   const [registroHoy, setRegistroHoy]       = useState(null);
@@ -472,5 +473,13 @@ export default function AsistenciaPage() {
         </p>
       </main>
     </div>
+  );
+}
+
+export default function AsistenciaPage() {
+  return (
+    <ProtectedRoute allowedRoles={["empleado"]}>
+      <AsistenciaContent />
+    </ProtectedRoute>
   );
 }
