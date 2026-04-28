@@ -281,6 +281,9 @@ function AsistenciaContent() {
                   <p>Correo: {userData.correo}</p>
                   <p>Rol: {userData.rol}</p>
                   <p>EmpleadoID Vinculado: {userData.empleadoId || 'null'}</p>
+                  {userData._debugError && (
+                    <p className="text-destructive font-semibold mt-2">Error FS: {userData._debugError}</p>
+                  )}
                 </div>
               )}
             </div>

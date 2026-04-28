@@ -64,46 +64,56 @@ export function useAuth(requireAuth = true) {
         // Si el empleadoId viene en el userData lo usamos, sino buscamos por uid
         if (empleadoIdVinculado) {
           const empRef = doc(db, "empleados", empleadoIdVinculado);
-          const empSnap = await getDoc(empRef);
-          if (empSnap.exists()) {
-            setEmpleadoId(empSnap.id);
-            setEmpleadoData({ id: empSnap.id, ...empSnap.data() });
-          } else {
-            setEmpleadoId(null);
-            setEmpleadoData(null);
+          try {
+            const empSnap = await getDoc(empRef);
+            if (empSnap.exists()) {
+              setEmpleadoId(empSnap.id);
+              setEmpleadoData({ id: empSnap.id, ...empSnap.data() });
+            } else {
+              setEmpleadoId(null);
+              setEmpleadoData(null);
+            }
+          } catch (empErr) {
+            console.error("Error leyendo empleado:", empErr);
+            setUserData(prev => ({...prev, _debugError: empErr.message}));
           }
         } else {
           // Fallback por uidAuth o uid
-          const q = query(
-            collection(db, "empleados"),
-            where("uidAuth", "==", firebaseUser.uid)
-          );
-          let querySnapshot = await getDocs(q);
-
-          // Retrocompatibilidad con el campo "uid" anterior
-          if (querySnapshot.empty) {
-            const qOld = query(
+          try {
+            const q = query(
               collection(db, "empleados"),
-              where("uid", "==", firebaseUser.uid)
+              where("uidAuth", "==", firebaseUser.uid)
             );
-            querySnapshot = await getDocs(qOld);
-          }
+            let querySnapshot = await getDocs(q);
 
-          if (!querySnapshot.empty) {
-            const empleadoDoc = querySnapshot.docs[0];
-            setEmpleadoId(empleadoDoc.id);
-            setEmpleadoData({
-              id: empleadoDoc.id,
-              ...empleadoDoc.data(),
-            });
-          } else {
-            setEmpleadoId(null);
-            setEmpleadoData(null);
+            if (querySnapshot.empty) {
+              const qOld = query(
+                collection(db, "empleados"),
+                where("uid", "==", firebaseUser.uid)
+              );
+              querySnapshot = await getDocs(qOld);
+            }
+
+            if (!querySnapshot.empty) {
+              const empleadoDoc = querySnapshot.docs[0];
+              setEmpleadoId(empleadoDoc.id);
+              setEmpleadoData({
+                id: empleadoDoc.id,
+                ...empleadoDoc.data(),
+              });
+            } else {
+              setEmpleadoId(null);
+              setEmpleadoData(null);
+            }
+          } catch (empErr) {
+            console.error("Error en fallback:", empErr);
+            setUserData(prev => ({...prev, _debugError: empErr.message}));
           }
         }
 
       } catch (error) {
         console.error("Error cargando autenticación:", error);
+        setUserData(prev => prev ? {...prev, _debugError: error.message} : null);
       }
 
       setLoading(false);
