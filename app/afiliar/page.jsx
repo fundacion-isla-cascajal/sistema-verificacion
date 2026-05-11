@@ -45,6 +45,10 @@ import html2canvas from "html2canvas";
 
 const VERIFICACION_BASE_URL = "https://sistema-verificacion.vercel.app/verificar?doc=";
 
+const PAISES = [
+  "Colombia", "Venezuela", "Ecuador", "Perú", "Chile", "Argentina", "Brasil", "Panamá", "México", "Estados Unidos", "España", "Otro"
+];
+
 // Colores Institucionales
 const COLORS = {
   azul: "#05318a",
@@ -394,22 +398,22 @@ export default function AfiliarPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel>País</FieldLabel>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Ej: Colombia"
-                      className="pl-10"
-                      value={formData.pais}
-                      onChange={(e) => handleInputChange("pais", e.target.value)}
-                    />
-                  </div>
+                  <Select value={formData.pais} onValueChange={(v) => handleInputChange("pais", v)}>
+                    <SelectTrigger className="pl-10 relative">
+                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="Seleccione país" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAISES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </Field>
                 <Field>
                   <FieldLabel>Ciudad</FieldLabel>
                   <div className="relative">
                     <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Ej: Buenaventura"
+                      placeholder="Escriba la ciudad"
                       className="pl-10"
                       value={formData.ciudad}
                       onChange={(e) => handleInputChange("ciudad", e.target.value)}
@@ -738,11 +742,9 @@ export default function AfiliarPage() {
                 )}
               </div>
 
-              {/* QR y Footer */}
               <div className="absolute bottom-0 left-0 w-full pt-4 pb-6 pl-10 pr-6 flex items-end justify-between">
                 <div className="flex flex-col gap-1">
                   <p className="text-[10px] font-black" style={{ color: COLORS.azul, margin: 0 }}>@fundacionislacascajal</p>
-                  <p className="text-[8px] font-bold" style={{ color: "#94a3b8", margin: 0 }}>www.fundacionislacascajal.org</p>
                 </div>
 
                 <div className="bg-white p-1 rounded-lg border-2" style={{ borderColor: COLORS.azul, backgroundColor: '#ffffff' }}>
@@ -897,7 +899,6 @@ export default function AfiliarPage() {
               <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', paddingTop: '16px', paddingBottom: '24px', paddingLeft: '40px', paddingRight: '24px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', boxSizing: 'border-box' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <p style={{ fontSize: '10px', fontWeight: 900, color: COLORS.azul, margin: 0 }}>@fundacionislacascajal</p>
-                  <p style={{ fontSize: '8px', fontWeight: 'bold', color: '#94a3b8', margin: 0 }}>www.fundacionislacascajal.org</p>
                 </div>
 
                 <div style={{ backgroundColor: '#ffffff', padding: '4px', borderRadius: '8px', border: `2px solid ${COLORS.azul}` }}>
