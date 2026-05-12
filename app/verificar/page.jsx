@@ -62,21 +62,13 @@ function VerificarContent() {
         }
 
         if (docData) {
-          setDocumento(docData);
-          // "activo" → válido, cualquier otra cosa → inactivo
-          if (docData.estado === "inactivo") {
+          const isExpired = docData.tipo === "afiliado" && docData.fechaExpiracion && new Date() > new Date(docData.fechaExpiracion);
+          setDocumento({ ...docData, isExpired });
+          
+          if (docData.estado === "inactivo" || isExpired) {
             setEstado("inactive");
           } else {
-            if (docData.tipo === "afiliado" && docData.fechaExpiracion) {
-              const isExpired = new Date() > new Date(docData.fechaExpiracion);
-              if (isExpired) {
-                setEstado("inactive");
-              } else {
-                setEstado("valid");
-              }
-            } else {
-              setEstado("valid");
-            }
+            setEstado("valid");
           }
         } else {
           setEstado("invalid");
@@ -171,10 +163,12 @@ function VerificarContent() {
                 <AlertCircle className="h-8 w-8 text-amber-500" />
               </div>
               <h3 className="text-lg font-semibold text-amber-600 mb-2">
-                {documento.tipo === "afiliado" ? "Afiliado Inactivo" : "Documento Inactivo"}
+                {documento.tipo === "afiliado" 
+                  ? (documento.isExpired ? "Afiliación Vencida" : "Afiliado Inactivo") 
+                  : "Documento Inactivo"}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Este {documento.tipo === "afiliado" ? "afiliado" : "documento"} está registrado pero se encuentra <strong>inactivo</strong> en el sistema.
+                Este {documento.tipo === "afiliado" ? "afiliado" : "documento"} está registrado pero se encuentra <strong>{documento.isExpired ? "vencido" : "inactivo"}</strong> en el sistema.
               </p>
               <div className="space-y-3 text-left max-w-xs mx-auto">
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
@@ -234,6 +228,15 @@ function VerificarContent() {
                     <p className="font-medium capitalize">{documento.tipo}</p>
                   </div>
                 </div>
+                {documento.tipo === "afiliado" && documento.tipoAfiliacion && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Award className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Tipo de Afiliación</p>
+                      <p className="font-medium capitalize">{documento.tipoAfiliacion}</p>
+                    </div>
+                  </div>
+                )}
                 {documento.tipo === "afiliado" && (
                   <>
                     {documento.pais && (
@@ -375,6 +378,15 @@ function VerificarContent() {
                     <p className="font-medium capitalize">{documento.tipo}</p>
                   </div>
                 </div>
+                {documento.tipo === "afiliado" && documento.tipoAfiliacion && (
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Award className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Tipo de Afiliación</p>
+                      <p className="font-medium capitalize">{documento.tipoAfiliacion}</p>
+                    </div>
+                  </div>
+                )}
                 {documento.tipo === "certificado" && documento.evento && (
                   <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                     <Calendar className="h-5 w-5 text-primary" />

@@ -91,6 +91,7 @@ export default function AfiliarPage() {
     pais: "Colombia",
     ciudad: "",
     beneficiarios: [], // Array de { nombre: "", nuip: "" }
+    tipoAfiliacion: "educativa",
   });
 
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -187,13 +188,23 @@ export default function AfiliarPage() {
         return;
       }
 
-      // Calcular fecha de expiración
+      // Calcular fecha de expiración según nuevas reglas
       const fIngreso = new Date(formData.fechaIngreso + "T12:00:00");
-      let fExpiracion = new Date(fIngreso);
-      if (formData.duracion === "6_meses") {
+      const year = fIngreso.getFullYear();
+      const month = fIngreso.getMonth(); // 0-11
+      
+      let fExpiracion;
+      if (formData.tipoAfiliacion === "educativa") {
+        if (month <= 4) { // Enero (0) a Mayo (4)
+          fExpiracion = new Date(year, 4, 30, 23, 59, 59); // 30 de Mayo
+        } else if (month >= 5 && month <= 10) { // Junio (5) a Noviembre (10)
+          fExpiracion = new Date(year, 10, 30, 23, 59, 59); // 30 de Noviembre
+        } else { // Diciembre (11)
+          fExpiracion = new Date(year + 1, 4, 30, 23, 59, 59); // 30 de Mayo del siguiente año
+        }
+      } else { // integral
+        fExpiracion = new Date(fIngreso);
         fExpiracion.setMonth(fExpiracion.getMonth() + 6);
-      } else {
-        fExpiracion.setFullYear(fExpiracion.getFullYear() + 1);
       }
 
       const isoExpiracion = fExpiracion.toISOString();
@@ -207,7 +218,7 @@ export default function AfiliarPage() {
           {
             inicio: new Date(formData.fechaIngreso + "T12:00:00").toISOString(),
             fin: isoExpiracion,
-            duracion: formData.duracion,
+            duracion: formData.tipoAfiliacion,
             tipo: "registro",
             fecha: new Date().toISOString()
           }
@@ -245,6 +256,7 @@ export default function AfiliarPage() {
         pais: "Colombia",
         ciudad: "",
         beneficiarios: [],
+        tipoAfiliacion: "educativa",
       });
       setFotoPreview(null);
 
@@ -528,17 +540,17 @@ export default function AfiliarPage() {
               </div>
 
               <Field className="max-w-[200px]">
-                <FieldLabel>Duración de Afiliación</FieldLabel>
+                <FieldLabel>Tipo de Afiliación</FieldLabel>
                 <Select
-                  value={formData.duracion}
-                  onValueChange={(val) => handleInputChange("duracion", val)}
+                  value={formData.tipoAfiliacion}
+                  onValueChange={(val) => handleInputChange("tipoAfiliacion", val)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccione duración" />
+                    <SelectValue placeholder="Seleccione tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="6_meses">6 Meses</SelectItem>
-                    <SelectItem value="1_ano">1 Año</SelectItem>
+                    <SelectItem value="educativa">Afiliación Educativa</SelectItem>
+                    <SelectItem value="integral">Afiliación Integral</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
@@ -811,6 +823,28 @@ export default function AfiliarPage() {
                     <p className="text-[9px] font-black uppercase" style={{ color: "#94a3b8", margin: 0 }}>Cargo</p>
                     <p className="text-sm font-black uppercase" style={{ color: "#334155", margin: 0 }}>{formData.cargo}</p>
                   </div>
+                  <div className="text-left col-span-2">
+                    <p className="text-[9px] font-black uppercase" style={{ color: "#94a3b8", margin: 0 }}>Vigencia / Tipo</p>
+                    <p className="text-[11px] font-black uppercase" style={{ color: COLORS.azul, margin: 0 }}>
+                      {formData.tipoAfiliacion === "educativa" ? "Educativa" : "Integral"} — {
+                        (() => {
+                          const fIngreso = new Date(formData.fechaIngreso + "T12:00:00");
+                          const year = fIngreso.getFullYear();
+                          const month = fIngreso.getMonth();
+                          let fExp;
+                          if (formData.tipoAfiliacion === "educativa") {
+                            if (month <= 4) fExp = new Date(year, 4, 30);
+                            else if (month <= 10) fExp = new Date(year, 10, 30);
+                            else fExp = new Date(year + 1, 4, 30);
+                          } else {
+                            fExp = new Date(fIngreso);
+                            fExp.setMonth(fExp.getMonth() + 6);
+                          }
+                          return fExp.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" });
+                        })()
+                      }
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -950,6 +984,28 @@ export default function AfiliarPage() {
                   <p style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', color: '#94a3b8', margin: 0 }}>Cargo</p>
                   <p style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', color: '#334155', margin: 0 }}>{formData.cargo}</p>
                 </div>
+                <div style={{ textAlign: 'left', gridColumn: 'span 2' }}>
+                  <p style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', color: '#94a3b8', margin: 0 }}>Vigencia / Tipo</p>
+                  <p style={{ fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', color: COLORS.azul, margin: 0 }}>
+                    {formData.tipoAfiliacion === "educativa" ? "Educativa" : "Integral"} — {
+                      (() => {
+                        const fIngreso = new Date(formData.fechaIngreso + "T12:00:00");
+                        const year = fIngreso.getFullYear();
+                        const month = fIngreso.getMonth();
+                        let fExp;
+                        if (formData.tipoAfiliacion === "educativa") {
+                          if (month <= 4) fExp = new Date(year, 4, 30);
+                          else if (month <= 10) fExp = new Date(year, 10, 30);
+                          else fExp = new Date(year + 1, 4, 30);
+                        } else {
+                          fExp = new Date(fIngreso);
+                          fExp.setMonth(fExp.getMonth() + 6);
+                        }
+                        return fExp.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" });
+                      })()
+                    }
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1024,8 +1080,25 @@ export default function AfiliarPage() {
               </p>
 
               <div style={{ margin: "40px auto", padding: "25px", border: "1px solid #ddd", borderRadius: "12px", width: "80%", backgroundColor: "#f9f9f9" }}>
-                <p style={{ margin: "8px 0", fontSize: "16px" }}><strong>Tipo de afiliación:</strong> AFILIADO</p>
+                <p style={{ margin: "8px 0", fontSize: "16px" }}><strong>Tipo de afiliación:</strong> {formData.tipoAfiliacion === "educativa" ? "AFILIACIÓN EDUCATIVA" : "AFILIACIÓN INTEGRAL"}</p>
                 <p style={{ margin: "8px 0", fontSize: "16px" }}><strong>Estado actual:</strong> <span style={{ color: COLORS.verde, fontWeight: "bold" }}>ACTIVO</span></p>
+                <p style={{ margin: "8px 0", fontSize: "16px" }}><strong>Vigencia hasta:</strong> <strong>{
+                  (() => {
+                    const fIngreso = new Date(formData.fechaIngreso + "T12:00:00");
+                    const year = fIngreso.getFullYear();
+                    const month = fIngreso.getMonth();
+                    let fExp;
+                    if (formData.tipoAfiliacion === "educativa") {
+                      if (month <= 4) fExp = new Date(year, 4, 30);
+                      else if (month <= 10) fExp = new Date(year, 10, 30);
+                      else fExp = new Date(year + 1, 4, 30);
+                    } else {
+                      fExp = new Date(fIngreso);
+                      fExp.setMonth(fExp.getMonth() + 6);
+                    }
+                    return fExp.toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric" });
+                  })()
+                }</strong></p>
                 <p style={{ margin: "8px 0", fontSize: "16px" }}><strong>Cargo / relación institucional:</strong> {formData.cargo || "Afiliado"}</p>
               </div>
 
