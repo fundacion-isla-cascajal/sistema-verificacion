@@ -1884,14 +1884,6 @@ function DashboardContent() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <ProtectedRoute allowedRoles={["superadmin", "recursos_humanos"]}>
-      <DashboardContent />
       {/* TEMPLATE OCULTO PARA CERTIFICADOS (Dashboard) */}
       <div style={{ position: "fixed", left: "-9999px", top: 0, zIndex: -1 }}>
         {currentCertData && (
@@ -1943,6 +1935,14 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute allowedRoles={["superadmin", "recursos_humanos"]}>
+      <DashboardContent />
     </ProtectedRoute>
   );
 }
