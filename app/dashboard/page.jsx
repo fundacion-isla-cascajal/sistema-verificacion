@@ -727,7 +727,7 @@ function DashboardContent() {
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
       // Generar QR
-      const qrDataUrl = await QRCode.toDataURL(`${window.location.origin}/verificar?doc=${persona.codigo}`);
+      const qrDataUrl = await QRCode.toDataURL(`${VERIFICACION_BASE_URL}${persona.codigo}`);
       const qrSize = 35;
       const marginX = pdfWidth - qrSize - 20;
       const marginY = pdf.internal.pageSize.getHeight() - qrSize - 30;
@@ -1080,6 +1080,28 @@ function DashboardContent() {
                                   >
                                     <QrCode className="h-4 w-4" />
                                   </Button>
+                                  {doc.tipo === "afiliado" && (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-success hover:text-success hover:bg-success/10"
+                                        onClick={() => descargarCertificadoDesdeDashboard(doc)}
+                                        title="Descargar Certificado"
+                                      >
+                                        <FileText className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-info hover:text-info hover:bg-info/10"
+                                        onClick={() => descargarCarnetDesdeDashboard(doc)}
+                                        title="Descargar Carnet"
+                                      >
+                                        <IdCard className="h-4 w-4" />
+                                      </Button>
+                                    </>
+                                  )}
                                   {esSuperAdmin && (
                                     <Button
                                       variant="ghost"
