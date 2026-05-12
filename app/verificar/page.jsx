@@ -18,6 +18,8 @@ import {
   AlertCircle,
   ArrowLeft,
   QrCode,
+  Globe,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -232,6 +234,43 @@ function VerificarContent() {
                     <p className="font-medium capitalize">{documento.tipo}</p>
                   </div>
                 </div>
+                {documento.tipo === "afiliado" && (
+                  <>
+                    {documento.pais && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        <Globe className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">País</p>
+                          <p className="font-medium">{documento.pais}</p>
+                        </div>
+                      </div>
+                    )}
+                    {documento.fechaExpiracion && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        <Calendar className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Fecha de Expiración</p>
+                          <p className="font-medium">
+                            {new Date(documento.fechaExpiracion).toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {documento.beneficiarios && documento.beneficiarios.length > 0 && (
+                      <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+                        <div className="flex items-center gap-3">
+                          <Users className="h-5 w-5 text-muted-foreground" />
+                          <p className="text-xs text-muted-foreground">Beneficiarios Autorizados</p>
+                        </div>
+                        <div className="pl-8 space-y-1">
+                          {documento.beneficiarios.map((ben, idx) => (
+                            <p key={idx} className="text-sm font-medium">• {ben.nombre}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
                 {documento.tipo === "certificado" && documento.evento && (
                   <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
@@ -362,6 +401,43 @@ function VerificarContent() {
                       <p className="font-medium capitalize">{documento.estado}</p>
                     </div>
                   </div>
+                )}
+                {documento.tipo === "afiliado" && (
+                  <>
+                    {documento.pais && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        <Globe className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">País</p>
+                          <p className="font-medium">{documento.pais}</p>
+                        </div>
+                      </div>
+                    )}
+                    {documento.fechaExpiracion && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        <Calendar className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Fecha de Expiración</p>
+                          <p className="font-medium">
+                            {new Date(documento.fechaExpiracion).toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {documento.beneficiarios && documento.beneficiarios.length > 0 && (
+                      <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+                        <div className="flex items-center gap-3">
+                          <Users className="h-5 w-5 text-primary" />
+                          <p className="text-xs text-muted-foreground">Beneficiarios Autorizados</p>
+                        </div>
+                        <div className="pl-8 space-y-1">
+                          {documento.beneficiarios.map((ben, idx) => (
+                            <p key={idx} className="text-sm font-medium">• {ben.nombre}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
