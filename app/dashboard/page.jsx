@@ -624,7 +624,7 @@ function DashboardContent() {
         else nuevaExpiracion = new Date(year + 1, 4, 30, 23, 59, 59);
       } else {
         nuevaExpiracion = new Date(ahora);
-        nuevaExpiracion.setMonth(nuevaExpiracion.getMonth() + 6);
+        nuevaExpiracion.setMonth(nuevaExpiracion.getMonth() + 12); // Ahora 1 año por defecto
       }
 
       // Nueva membresía a insertar/actualizar
@@ -666,7 +666,7 @@ function DashboardContent() {
       toast.error("Error al procesar la renovación");
     } finally {
       setUpdatingStatus(null);
-      setDuracionReactivacion("6_meses");
+      setDuracionReactivacion("integral");
     }
   };
 
@@ -1481,6 +1481,12 @@ function DashboardContent() {
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-2 gap-3">
               <button
+                onClick={() => setDuracionReactivacion("6_meses")}
+                className={`p-4 rounded-xl border-2 text-center transition-all ${duracionReactivacion === "6_meses"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-muted hover:border-primary/40"
+                  }`}
+              >
                 <p className="text-xl font-bold uppercase">Integral</p>
                 <p className="text-[10px] font-medium opacity-70">1 AÑO (PREDETERMINADO)</p>
               </button>
