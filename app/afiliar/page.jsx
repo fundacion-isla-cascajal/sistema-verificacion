@@ -169,17 +169,49 @@ export default function AfiliarPage() {
     }));
   };
 
-  const handleFotoChange = (e) => {
+  const comprimirImagen = (base64Str, quality = 0.7, maxWidth = 500) => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+    });
+  };
+
+  const handleFotoChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("La foto es muy pesada (máx 2MB)");
+      // Permitimos subir hasta 5MB pero luego comprimimos
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("La foto es demasiado pesada (máx 5MB)");
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFotoPreview(reader.result);
-        setFormData(prev => ({ ...prev, foto: reader.result }));
+      reader.onloadend = async () => {
+        try {
+          const originalBase64 = reader.result;
+          // Comprimir la imagen antes de guardarla
+          const compressedBase64 = await comprimirImagen(originalBase64);
+          setFotoPreview(compressedBase64);
+          setFormData(prev => ({ ...prev, foto: compressedBase64 }));
+        } catch (err) {
+          console.error("Error al comprimir imagen:", err);
+          toast.error("Error al procesar la imagen");
+        }
       };
       reader.readAsDataURL(file);
     }
