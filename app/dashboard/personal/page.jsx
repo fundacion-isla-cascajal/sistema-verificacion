@@ -410,7 +410,7 @@ function PersonalContent() {
   const generarCarnetPersonal = async (persona) => {
     toast.info("Generando carnet...");
     try {
-      const VERIFICACION_BASE_URL = typeof window !== 'undefined' ? `${window.location.origin}/verificar?doc=` : 'https://ficong.com/verificar?doc=';
+      const VERIFICACION_BASE_URL = 'https://sistema-verificacion.vercel.app/verificar?doc=';
       const qrUrl = await QRCode.toDataURL(`${VERIFICACION_BASE_URL}${persona.codigoInstitucional}`);
       setQrPersonal(qrUrl);
       setPersonalReciente(persona);
@@ -463,7 +463,7 @@ function PersonalContent() {
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
       // Generar QR
-      const VERIFICACION_BASE_URL = typeof window !== 'undefined' ? `${window.location.origin}/verificar?codigo=` : 'https://ficong.com/verificar?codigo=';
+      const VERIFICACION_BASE_URL = 'https://sistema-verificacion.vercel.app/verificar?doc=';
       const qrDataUrl = await QRCode.toDataURL(`${VERIFICACION_BASE_URL}${persona.codigoInstitucional}`);
       const qrSize = 35;
       const marginX = pdfWidth - qrSize - 20;
@@ -822,12 +822,12 @@ function PersonalContent() {
                               </Select>
 
                                 {formData.horarioModalidad[dia].modalidad !== "libre" && (
-                                  <div className="flex items-center gap-3 pt-2">
-                                    <div className="flex-1 space-y-1.5">
-                                      <label className="text-[10px] font-bold text-muted-foreground uppercase text-center block">Entrada</label>
+                                  <div className="flex gap-2 pt-2">
+                                    <div className="flex-1 bg-muted/20 p-2 rounded-md border flex flex-col items-center justify-center">
+                                      <label className="text-[9px] font-bold text-muted-foreground uppercase mb-1">Entrada</label>
                                       <Input
                                         type="time"
-                                        className="h-9 text-xs text-center font-medium"
+                                        className="h-7 text-xs text-center border-none bg-transparent shadow-none focus-visible:ring-0 p-0"
                                         value={formData.horarioModalidad[dia].entrada}
                                         onChange={(e) => setFormData({
                                           ...formData,
@@ -838,11 +838,11 @@ function PersonalContent() {
                                         })}
                                       />
                                     </div>
-                                    <div className="flex-1 space-y-1.5">
-                                      <label className="text-[10px] font-bold text-muted-foreground uppercase text-center block">Salida</label>
+                                    <div className="flex-1 bg-muted/20 p-2 rounded-md border flex flex-col items-center justify-center">
+                                      <label className="text-[9px] font-bold text-muted-foreground uppercase mb-1">Salida</label>
                                       <Input
                                         type="time"
-                                        className="h-9 text-xs text-center font-medium"
+                                        className="h-7 text-xs text-center border-none bg-transparent shadow-none focus-visible:ring-0 p-0"
                                         value={formData.horarioModalidad[dia].salida}
                                         onChange={(e) => setFormData({
                                           ...formData,
@@ -1094,12 +1094,12 @@ function PersonalContent() {
                   </Select>
 
                   {horarioEdit[dia]?.modalidad !== "libre" && (
-                    <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-1 mt-2">
-                      <div className="flex-1 space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase text-muted-foreground text-center block">Entrada</label>
+                    <div className="flex gap-2 mt-2">
+                      <div className="flex-1 bg-card p-2 rounded-lg border shadow-sm flex flex-col items-center">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Entrada</label>
                         <Input
                           type="time"
-                          className="h-9 text-xs text-center font-medium"
+                          className="h-8 text-xs text-center border-none shadow-none focus-visible:ring-0 p-0"
                           value={horarioEdit[dia]?.entrada}
                           onChange={(e) => setHorarioEdit({
                             ...horarioEdit,
@@ -1107,11 +1107,11 @@ function PersonalContent() {
                           })}
                         />
                       </div>
-                      <div className="flex-1 space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase text-muted-foreground text-center block">Salida</label>
+                      <div className="flex-1 bg-card p-2 rounded-lg border shadow-sm flex flex-col items-center">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Salida</label>
                         <Input
                           type="time"
-                          className="h-9 text-xs text-center font-medium"
+                          className="h-8 text-xs text-center border-none shadow-none focus-visible:ring-0 p-0"
                           value={horarioEdit[dia]?.salida}
                           onChange={(e) => setHorarioEdit({
                             ...horarioEdit,

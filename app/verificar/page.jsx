@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,11 +51,26 @@ function VerificarContent() {
         if (personaSnap.exists()) {
           docData = { codigo: personaSnap.id, tipo: "afiliado", ...personaSnap.data() };
         } else {
-          // 2. Si no es afiliado, buscar en 'documentos' (Certificados, etc)
-          const docRef = doc(db, "documentos", codigo);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            docData = { codigo: docSnap.id, ...docSnap.data(), tipo: "certificado" };
+          // 2. Si no es afiliado, buscar en 'empleados' por codigoInstitucional
+          const empQuery = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigo));
+          const empSnap = await getDocs(empQuery);
+          
+          if (!empSnap.empty) {
+            const empDoc = empSnap.docs[0];
+            docData = { 
+              codigo: empDoc.data().codigoInstitucional, 
+              tipo: "afiliado",
+              esPersonalInstitucional: true,
+              cedula: empDoc.data().documento,
+              ...empDoc.data() 
+            };
+          } else {
+            // 3. Buscar en 'documentos' (Certificados, etc)
+            const docRef = doc(db, "documentos", codigo);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              docData = { codigo: docSnap.id, ...docSnap.data(), tipo: "certificado" };
+            }
           }
         }
 
