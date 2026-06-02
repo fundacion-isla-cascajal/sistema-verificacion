@@ -28,7 +28,8 @@ import { Button } from "@/components/ui/button";
 
 function VerificarContent() {
   const searchParams = useSearchParams();
-  const codigo = searchParams.get("doc")?.trim().toUpperCase();
+  const codigoRaw = searchParams.get("doc")?.trim();
+  const codigo = codigoRaw?.toUpperCase();
   const source = searchParams.get("source");
 
   const [estado, setEstado] = useState("loading");
@@ -44,25 +45,35 @@ function VerificarContent() {
       try {
         let docData = null;
 
-        // 1. Buscar en 'afiliados' (Sistema Integrado)
-        const personaRef = doc(db, "afiliados", codigo);
-        const personaSnap = await getDoc(personaRef);
+        // 1. Buscar en 'afiliados' por campo 'codigo' (no por ID del documento)
+        const afiliadosQuery = query(collection(db, "afiliados"), where("codigo", "==", codigo));
+        const afiliadosSnap = await getDocs(afiliadosQuery);
 
-        if (personaSnap.exists()) {
-          docData = { codigo: personaSnap.id, tipo: "afiliado", ...personaSnap.data() };
+        if (!afiliadosSnap.empty) {
+          const afiliadoDoc = afiliadosSnap.docs[0];
+          docData = { codigo: afiliadoDoc.data().codigo, tipo: "afiliado", ...afiliadoDoc.data() };
         } else {
-          // 2. Si no es afiliado, buscar en 'empleados' por codigoInstitucional
-          const empQuery = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigo));
-          const empSnap = await getDocs(empQuery);
-          
+          // 2. Buscar en 'empleados' por codigoInstitucional (exacto tal como fue guardado)
+          // Intentar con el valor tal como viene, y también en mayúsculas
+          let empSnap = null;
+          const empQueryUpper = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigo));
+          empSnap = await getDocs(empQueryUpper);
+
+          if (empSnap.empty && codigoRaw) {
+            // Intentar con el valor original sin transformar
+            const empQueryRaw = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigoRaw));
+            empSnap = await getDocs(empQueryRaw);
+          }
+
           if (!empSnap.empty) {
             const empDoc = empSnap.docs[0];
-            docData = { 
-              codigo: empDoc.data().codigoInstitucional, 
+            docData = {
+              codigo: empDoc.data().codigoInstitucional,
               tipo: "afiliado",
               esPersonalInstitucional: true,
               cedula: empDoc.data().documento,
-              ...empDoc.data() 
+              estado: empDoc.data().estado || "activo",
+              ...empDoc.data()
             };
           } else {
             // 3. Buscar en 'documentos' (Certificados, etc)
@@ -79,8 +90,16 @@ function VerificarContent() {
           let isExpired = false;
 
           if (docData.tipo === "afiliado") {
-            const hasActiveMembership = docData.membresias?.some(m => now <= new Date(m.fechaExpiracion));
-            isExpired = !hasActiveMembership;
+            if (docData.esPersonalInstitucional) {
+              // Personal: activo si estado === 'activo'
+              isExpired = docData.estado !== "activo";
+            } else {
+              // Afiliado: activo si tiene membresía vigente o membresía 'indefinida'
+              const hasActiveMembership = docData.membresias?.some(m =>
+                m.fechaExpiracion === "indefinida" || now <= new Date(m.fechaExpiracion)
+              );
+              isExpired = !hasActiveMembership;
+            }
           } else {
             isExpired = docData.fechaExpiracion && now > new Date(docData.fechaExpiracion);
           }
@@ -210,20 +229,61 @@ function VerificarContent() {
                   </div>
                 </div>
 
-                {/* Detalles de Membresía (Solo Afiliados) */}
-                {documento.tipo === "afiliado" && (
+                {/* Detalles de Personal Institucional */}
+                {documento.esPersonalInstitucional && (
+                  <div className="bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 space-y-3">
+                    <p className="text-[10px] uppercase font-black text-indigo-600 dark:text-indigo-400 tracking-widest flex items-center gap-2">
+                      <ShieldCheck className="h-3 w-3" /> Vinculación Institucional
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {documento.cargo && (
+                        <div>
+                          <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Cargo</p>
+                          <p className="text-sm font-bold">{documento.cargo}</p>
+                        </div>
+                      )}
+                      {documento.tipoPersonal && (
+                        <div>
+                          <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Tipo</p>
+                          <p className="text-sm font-bold">{documento.tipoPersonal}</p>
+                        </div>
+                      )}
+                      {documento.modalidadLaboral && (
+                        <div>
+                          <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Modalidad</p>
+                          <p className="text-sm font-bold">{documento.modalidadLaboral}</p>
+                        </div>
+                      )}
+                      {documento.fechaIngreso && (
+                        <div>
+                          <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Fecha de Ingreso</p>
+                          <p className="text-sm font-bold">{formatearFecha(documento.fechaIngreso)}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="pt-2 border-t border-indigo-200 dark:border-indigo-800 flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-black text-muted-foreground">Estado Laboral</span>
+                      <Badge className="bg-green-500 text-white text-[10px]">ACTIVO</Badge>
+                    </div>
+                  </div>
+                )}
+
+                {/* Detalles de Membresía (Solo Afiliados NO institucionales) */}
+                {documento.tipo === "afiliado" && !documento.esPersonalInstitucional && (
                   <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 space-y-3">
                     <p className="text-[10px] uppercase font-black text-primary tracking-widest flex items-center gap-2">
                       <ShieldCheck className="h-3 w-3" /> Membresías Institucionales
                     </p>
                     <div className="space-y-2">
                       {documento.membresias?.map((m, idx) => {
-                        const expired = new Date() > new Date(m.fechaExpiracion);
+                        const expired = m.fechaExpiracion !== "indefinida" && new Date() > new Date(m.fechaExpiracion);
                         return (
                           <div key={idx} className="flex justify-between items-center p-2 bg-white rounded-lg border shadow-sm">
                             <div className="flex flex-col">
                               <span className="text-xs font-bold uppercase">{m.tipo}</span>
-                              <span className="text-[10px] text-muted-foreground">Vence: {formatearFecha(m.fechaExpiracion)}</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {m.fechaExpiracion === "indefinida" ? "Vigencia: Indefinida" : `Vence: ${formatearFecha(m.fechaExpiracion)}`}
+                              </span>
                             </div>
                             <Badge variant={expired ? "destructive" : "default"} className="text-[9px] h-5">
                               {expired ? "VENCIDA" : "VIGENTE"}
