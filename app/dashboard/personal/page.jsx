@@ -884,54 +884,66 @@ function PersonalContent() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 bg-muted/10 p-5 rounded-xl border">
                       <div className="space-y-2">
                         <label className="text-xs font-semibold uppercase text-muted-foreground">Tipo de Vinculación</label>
-                        <Select value={formData.tipoVinculacion} onValueChange={v => setFormData({ ...formData, tipoVinculacion: v })}>
+                        <Select value={formData.tipoVinculacion} onValueChange={v => setFormData({ ...formData, tipoVinculacion: v, tiempoContrato: "", tiempoPeriodoPrueba: "" })}>
                           <SelectTrigger><SelectValue placeholder="Seleccione..."/></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Contrato">Contrato</SelectItem>
-                            <SelectItem value="Nombramiento">Nombramiento / Periodo de prueba</SelectItem>
+                            <SelectItem value="Nombramiento">Nombramiento</SelectItem>
+                            <SelectItem value="Periodo de Prueba">Período de Prueba</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       
-                      <div className="space-y-2">
-                        <label className="text-xs font-semibold uppercase text-muted-foreground">Tipo de Contrato</label>
-                        <Select value={formData.tipoContrato} onValueChange={v => setFormData({ ...formData, tipoContrato: v })}>
-                          <SelectTrigger><SelectValue placeholder="Seleccione..."/></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="A Término Fijo">A Término Fijo</SelectItem>
-                            <SelectItem value="A Término Indefinido">A Término Indefinido</SelectItem>
-                            <SelectItem value="De Obra o Labor">De Obra o Labor</SelectItem>
-                            <SelectItem value="Por Prestación de Servicios">Por Prestación de Servicios</SelectItem>
-                            <SelectItem value="Ocasional, Accidental o Transitorio">Ocasional, Accidental o Transitorio</SelectItem>
-                            <SelectItem value="De Aprendizaje">De Aprendizaje</SelectItem>
-                            <SelectItem value="De Prácticas">De Prácticas</SelectItem>
-                            <SelectItem value="De Pasantías">De Pasantías</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-xs font-semibold uppercase text-muted-foreground">¿Período de prueba?</label>
-                        <Select value={formData.tienePeriodoPrueba ? "si" : "no"} onValueChange={v => setFormData({ ...formData, tienePeriodoPrueba: v === "si" })}>
-                          <SelectTrigger><SelectValue/></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="si">Sí</SelectItem>
-                            <SelectItem value="no">No</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {formData.tienePeriodoPrueba && (
+                      {/* Tipo de contrato: solo visible si es Contrato o Nombramiento */}
+                      {(formData.tipoVinculacion === "Contrato" || formData.tipoVinculacion === "Nombramiento") && (
                         <div className="space-y-2 animate-in fade-in zoom-in duration-200">
-                          <label className="text-xs font-semibold uppercase text-muted-foreground">Tiempo de prueba (días)</label>
-                          <Input type="number" min="15" max="60" value={formData.tiempoPeriodoPrueba} onChange={e => setFormData({ ...formData, tiempoPeriodoPrueba: e.target.value })} placeholder="Ej. 15 a 60" />
+                          <label className="text-xs font-semibold uppercase text-muted-foreground">Tipo de Contrato</label>
+                          <Select value={formData.tipoContrato} onValueChange={v => setFormData({ ...formData, tipoContrato: v })}>
+                            <SelectTrigger><SelectValue placeholder="Seleccione..."/></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="A Término Fijo">A Término Fijo</SelectItem>
+                              <SelectItem value="A Término Indefinido">A Término Indefinido</SelectItem>
+                              <SelectItem value="De Obra o Labor">De Obra o Labor</SelectItem>
+                              <SelectItem value="Por Prestación de Servicios">Por Prestación de Servicios</SelectItem>
+                              <SelectItem value="Ocasional, Accidental o Transitorio">Ocasional, Accidental o Transitorio</SelectItem>
+                              <SelectItem value="De Aprendizaje">De Aprendizaje</SelectItem>
+                              <SelectItem value="De Prácticas">De Prácticas</SelectItem>
+                              <SelectItem value="De Pasantías">De Pasantías</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       )}
 
-                      <div className="space-y-2">
-                        <label className="text-xs font-semibold uppercase text-muted-foreground">Tiempo del Contrato</label>
-                        <Input value={formData.tiempoContrato} onChange={e => setFormData({ ...formData, tiempoContrato: e.target.value })} placeholder="Indefinido, o 1 a 60 meses" />
-                      </div>
+                      {/* Tiempo del período de prueba: 1-20 días */}
+                      {formData.tipoVinculacion === "Periodo de Prueba" && (
+                        <div className="space-y-2 animate-in fade-in zoom-in duration-200">
+                          <label className="text-xs font-semibold uppercase text-muted-foreground">Tiempo del Período de Prueba</label>
+                          <Select value={formData.tiempoPeriodoPrueba} onValueChange={v => setFormData({ ...formData, tiempoPeriodoPrueba: v })}>
+                            <SelectTrigger><SelectValue placeholder="Seleccione días..."/></SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 20 }, (_, i) => i + 1).map(d => (
+                                <SelectItem key={d} value={String(d)}>{d} {d === 1 ? "día" : "días"}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Tiempo del contrato: 1-60 meses, solo para Contrato o Nombramiento */}
+                      {(formData.tipoVinculacion === "Contrato" || formData.tipoVinculacion === "Nombramiento") && (
+                        <div className="space-y-2 animate-in fade-in zoom-in duration-200">
+                          <label className="text-xs font-semibold uppercase text-muted-foreground">Tiempo del Contrato</label>
+                          <Select value={formData.tiempoContrato} onValueChange={v => setFormData({ ...formData, tiempoContrato: v })}>
+                            <SelectTrigger><SelectValue placeholder="Seleccione meses..."/></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Indefinido">Indefinido</SelectItem>
+                              {Array.from({ length: 60 }, (_, i) => i + 1).map(m => (
+                                <SelectItem key={m} value={String(m)}>{m} {m === 1 ? "mes" : "meses"}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
 
                       <div className="space-y-2">
                         <label className="text-xs font-semibold uppercase text-muted-foreground">Salario u Honorario</label>
