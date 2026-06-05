@@ -851,9 +851,9 @@ function PersonalContent() {
                         ) : (
                           <UserPlus className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
                         )}
-                        <input type="file" accept="image/*" onChange={handleFotoChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                        <input type="file" accept="image/*" required={!isEditing && !fotoPreview} onChange={handleFotoChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                       </div>
-                      <p className="text-xs text-muted-foreground font-medium">Foto oficial (opcional)</p>
+                      <p className="text-xs text-muted-foreground font-medium">Foto oficial (requerida)*</p>
                     </div>
 
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1438,7 +1438,7 @@ function PersonalContent() {
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '180px', overflow: 'hidden' }}>
                 <div style={{
                   position: 'absolute', top: '-40px', left: '-40px', width: '120%', height: '120%',
-                  transform: 'rotate(15deg)', background: `linear-gradient(135deg, ${COLORS.azul} 0%, ${COLORS.verde} 100%)`
+                  transform: 'rotate(15deg)', background: `linear-gradient(135deg, #5c4033 0%, #8b5a2b 100%)`
                 }} />
               </div>
 
@@ -1456,7 +1456,7 @@ function PersonalContent() {
 
               <div style={{ marginTop: '30px', padding: '0 40px 100px 40px', textAlign: 'center' }}>
                 <div style={{ display: 'inline-block', backgroundColor: COLORS.rojo, color: 'white', padding: '4px 12px', borderRadius: '9999px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '10px' }}>
-                  {personalReciente.tipoPersonal}
+                  LÍDER
                 </div>
                 <h3 style={{ fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', color: '#1e293b', margin: 0 }}>
                   {personalReciente.nombre}
