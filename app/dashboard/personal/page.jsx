@@ -397,7 +397,7 @@ function PersonalContent() {
       mascotas: target.mascotas || [],
       foto: target.foto || null,
       horarioModalidad: target.horarioModalidad || HORARIO_DEFAULT,
-      memorandos: target.memorandos || []
+      memorandos: Array.isArray(target.memorandos) ? target.memorandos : []
     });
     setFotoPreview(target.foto || null);
     setIsEditing(true);
@@ -751,7 +751,7 @@ function PersonalContent() {
                                 }>
                                   {u.rol}
                                 </Badge>
-                                {personal?.memorandos?.filter(m => typeof m === 'string' && m.trim() !== "").length > 0 && (
+                                {Array.isArray(personal?.memorandos) && personal.memorandos.filter(m => typeof m === 'string' && m.trim() !== "").length > 0 && (
                                   <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-[9px] mt-1 flex gap-1 items-center w-fit">
                                     <AlertCircle className="w-3 h-3" />
                                     {personal.memorandos.filter(m => typeof m === 'string' && m.trim() !== "").length} Memorando(s)
@@ -850,7 +850,7 @@ function PersonalContent() {
 
             <Card>
               <CardContent className="p-6">
-                <form onSubmit={isEditing ? handleEditarUsuario : handleCrearUsuario} className="space-y-8">
+                <form onSubmit={isEditing ? handleEditarUsuario : handleCrearUsuario} className="space-y-8" autoComplete="off">
                   {/* FOTO Y DATOS BÁSICOS */}
                   <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex flex-col items-center gap-3 shrink-0">
@@ -1624,7 +1624,7 @@ function PersonalContent() {
 
 export default function PersonalPage() {
   return (
-    <ProtectedRoute allowedRoles={["superadmin", "recursos_humanos"]}>
+    <ProtectedRoute allowedRoles={["superadmin", "recursos_humanos", "personal"]}>
       <PersonalContent />
     </ProtectedRoute>
   );

@@ -45,8 +45,8 @@ export default function ProtectedRoute({ allowedRoles, children }) {
       if (userData.rol === "empleado" && !pathname.startsWith("/asistencia")) {
         router.push("/asistencia");
       } 
-      // Si es un recursos_humanos intentando entrar a zona superadmin o asistencia, forzar a personal
-      else if (userData.rol === "recursos_humanos" && !pathname.includes("/dashboard/personal") && !pathname.includes("/generar")) {
+      // Si es un recursos_humanos o personal intentando entrar a zona superadmin o asistencia, forzar a personal
+      else if ((userData.rol === "recursos_humanos" || userData.rol === "personal") && !pathname.includes("/dashboard/personal") && !pathname.includes("/generar")) {
         router.push("/dashboard/personal");
       }
       // Redirigir a unauthorized por defecto

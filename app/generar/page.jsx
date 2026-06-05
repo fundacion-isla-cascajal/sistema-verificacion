@@ -590,7 +590,7 @@ function GenerarContent() {
 
 export default function GenerarPage() {
   return (
-    <ProtectedRoute allowedRoles={["superadmin", "recursos_humanos"]}>
+    <ProtectedRoute allowedRoles={["superadmin", "recursos_humanos", "personal"]}>
       <GenerarContent />
     </ProtectedRoute>
   );
