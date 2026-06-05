@@ -100,6 +100,7 @@ function PersonalContent() {
   const [fotoPreview, setFotoPreview] = useState(null);
   const [creando, setCreando] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [permitirModificarNiup, setPermitirModificarNiup] = useState(false);
   const [editId, setEditId] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [personalReciente, setPersonalReciente] = useState(null);
@@ -398,6 +399,7 @@ function PersonalContent() {
     });
     setFotoPreview(target.foto || null);
     setIsEditing(true);
+    setPermitirModificarNiup(false);
     setEditId({ uId: usuarioObj.id, empleadoId: target.id || null });
     setView("create");
   };
@@ -508,6 +510,7 @@ function PersonalContent() {
     } finally {
       setCreando(false);
       setIsEditing(false);
+      setPermitirModificarNiup(false);
       setEditId(null);
     }
   };
@@ -867,8 +870,30 @@ function PersonalContent() {
                         <Input value={formData.segundoApellido} onChange={e => handleNameChange("segundoApellido", e.target.value)} placeholder="Ej. Gómez (Opcional)" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-semibold uppercase text-muted-foreground">Documento (NIUP) *</label>
-                        <Input required value={formData.documento} onChange={handleDocumentChange} placeholder="1.234.567.890" disabled={isEditing} />
+                        <label className="text-xs font-semibold uppercase text-muted-foreground flex items-center justify-between">
+                          <span>Documento (NIUP) *</span>
+                          {isEditing && !permitirModificarNiup && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const seguro = window.confirm("¿Está seguro de que desea modificar el NIUP? Esto cambiará el número de documento de este personal.");
+                                if (seguro) {
+                                  setPermitirModificarNiup(true);
+                                }
+                              }}
+                              className="text-xs font-semibold text-amber-500 hover:text-amber-600 hover:underline cursor-pointer"
+                            >
+                              Modificar NIUP
+                            </button>
+                          )}
+                        </label>
+                        <Input 
+                          required 
+                          value={formData.documento} 
+                          onChange={handleDocumentChange} 
+                          placeholder="1.234.567.890" 
+                          disabled={isEditing && !permitirModificarNiup} 
+                        />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-semibold uppercase text-muted-foreground">Teléfono</label>
@@ -1237,7 +1262,7 @@ function PersonalContent() {
                   </div>
 
                   <div className="flex justify-end gap-3 pt-6 border-t">
-                    <Button type="button" variant="outline" onClick={() => { setView("table"); setIsEditing(false); setEditId(null); }} disabled={creando}>Cancelar</Button>
+                    <Button type="button" variant="outline" onClick={() => { setView("table"); setIsEditing(false); setPermitirModificarNiup(false); setEditId(null); }} disabled={creando}>Cancelar</Button>
                     <Button type="submit" className="min-w-[150px]" disabled={creando}>
                       {creando ? <Spinner className="w-4 h-4 mr-2" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                       {isEditing ? "Actualizar Personal" : "Crear Personal"}
