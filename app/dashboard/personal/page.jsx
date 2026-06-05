@@ -1482,17 +1482,17 @@ function PersonalContent() {
               id="hidden-carnet-personal"
               style={{ width: '380px', height: '580px', background: '#ffffff', position: 'relative', overflow: 'hidden', borderRadius: '32px', fontFamily: 'sans-serif' }}
             >
-              {/* Decoración Superior Tierra */}
-              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '180px', overflow: 'hidden', background: `linear-gradient(135deg, #5c4033 0%, #8b5a2b 100%)` }}>
+              {/* Decoración Superior Anaranjado/Rojizo */}
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '210px', overflow: 'hidden', background: `linear-gradient(135deg, #ea580c 0%, #991b1b 100%)` }}>
               </div>
 
               {/* Logo y Encabezado */}
               <div style={{ position: 'relative', zIndex: 10, paddingTop: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ backgroundColor: '#ffffff', padding: '8px', borderRadius: '9999px', marginBottom: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                  <img src="/logo.png" alt="Logo" style={{ width: '60px', height: '60px', borderRadius: '9999px' }} />
+                <div style={{ backgroundColor: '#ffffff', padding: '10px', borderRadius: '9999px', marginBottom: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.2)' }}>
+                  <img src="/logo.png" alt="Logo" style={{ width: '85px', height: '85px', borderRadius: '9999px', objectFit: 'contain' }} />
                 </div>
-                <h2 style={{ color: '#ffffff', fontWeight: 900, fontSize: '24px', margin: 0, textShadow: '0 2px 4px rgba(0,0,0,0.5)', letterSpacing: '-0.05em' }}>ISLA CASCAJAL</h2>
-                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '4px' }}>Fundación</p>
+                <h2 style={{ color: '#ffffff', fontWeight: 900, fontSize: '26px', margin: 0, textShadow: '0 2px 6px rgba(0,0,0,0.6)', letterSpacing: '-0.05em' }}>ISLA CASCAJAL</h2>
+                <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '4px', marginTop: '6px', textShadow: '0 2px 6px rgba(0,0,0,0.8)' }}>Fundación</p>
               </div>
 
               {/* Foto de Perfil y Badge LÍDER */}
@@ -1509,8 +1509,8 @@ function PersonalContent() {
                   )}
                 </div>
 
-                <div style={{ marginTop: '-20px', position: 'relative', zIndex: 20, padding: '6px 32px', borderRadius: '9999px', border: '2px solid #ffffff', backgroundColor: '#5c4033', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                  <span style={{ color: '#ffffff', fontWeight: 900, fontSize: '14px', textTransform: 'uppercase', letterSpacing: '2px' }}>LÍDER</span>
+                <div style={{ marginTop: '-20px', position: 'relative', zIndex: 20, padding: '6px 32px', borderRadius: '9999px', border: '2px solid #ffffff', backgroundColor: '#b91c1c', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                  <span style={{ color: '#ffffff', fontWeight: 900, fontSize: '14px', textTransform: 'uppercase', letterSpacing: '2px', marginLeft: '2px' }}>LÍDER</span>
                 </div>
               </div>
 
@@ -1519,7 +1519,7 @@ function PersonalContent() {
                 <h3 style={{ fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', color: '#1e293b', margin: 0, lineHeight: 1.1 }}>
                   {personalReciente.nombre}
                 </h3>
-                <p style={{ fontWeight: 'bold', fontSize: '12px', color: '#8b5a2b', marginTop: '4px', textTransform: 'uppercase', margin: '4px 0 0 0' }}>
+                <p style={{ fontWeight: 'bold', fontSize: '12px', color: '#b91c1c', marginTop: '4px', textTransform: 'uppercase', margin: '4px 0 0 0' }}>
                   {personalReciente.cargo}
                 </p>
 
@@ -1534,7 +1534,7 @@ function PersonalContent() {
                   </div>
                   <div style={{ gridColumn: 'span 2' }}>
                     <p style={{ fontSize: '9px', fontWeight: 900, color: '#94a3b8', margin: 0, textTransform: 'uppercase' }}>CÓDIGO INSTITUCIONAL</p>
-                    <p style={{ fontSize: '16px', fontWeight: 900, color: '#8b5a2b', margin: 0, fontFamily: 'monospace', letterSpacing: '-0.05em' }}>{personalReciente.codigoInstitucional}</p>
+                    <p style={{ fontSize: '16px', fontWeight: 900, color: '#b91c1c', margin: 0, fontFamily: 'monospace', letterSpacing: '-0.05em' }}>{personalReciente.codigoInstitucional}</p>
                   </div>
                 </div>
               </div>
@@ -1595,7 +1595,14 @@ function PersonalContent() {
                   <p>FECHA DE INGRESO: {personalReciente.fechaIngreso}</p>
                   <p>TERMINACIÓN DEL CONTRATO: {personalReciente.fechaTerminacion || "No aplica"}</p>
                   <p>MOTIVO DE TERMINACIÓN: {personalReciente.motivoTerminacion || "No aplica"}</p>
-                  <p>SALARIO U HONORARIO MENSUAL: {personalReciente.salario || "No especificado"}</p>
+                  <p>SALARIO U HONORARIO MENSUAL: {(() => {
+                    const s = personalReciente.salario;
+                    if (!s) return "No especificado";
+                    const str = String(s);
+                    if (str.includes("$")) return str;
+                    const num = str.replace(/\D/g, "");
+                    return num ? "$ " + parseInt(num, 10).toLocaleString("es-CO") : str;
+                  })()}</p>
                 </div>
 
                 <p style={{ marginTop: "30px" }}>
