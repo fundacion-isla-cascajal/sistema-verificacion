@@ -95,7 +95,8 @@ function PersonalContent() {
     beneficiarios: [],
     mascotas: [],
     foto: null,
-    horarioModalidad: HORARIO_DEFAULT
+    horarioModalidad: HORARIO_DEFAULT,
+    memorandos: []
   });
   const [fotoPreview, setFotoPreview] = useState(null);
   const [creando, setCreando] = useState(false);
@@ -395,7 +396,8 @@ function PersonalContent() {
       beneficiarios: target.beneficiarios || [],
       mascotas: target.mascotas || [],
       foto: target.foto || null,
-      horarioModalidad: target.horarioModalidad || HORARIO_DEFAULT
+      horarioModalidad: target.horarioModalidad || HORARIO_DEFAULT,
+      memorandos: target.memorandos || []
     });
     setFotoPreview(target.foto || null);
     setIsEditing(true);
@@ -499,6 +501,7 @@ function PersonalContent() {
           salario: formData.salario,
           modalidadLaboral: formData.modalidadLaboral,
           foto: formData.foto,
+          memorandos: formData.memorandos || [],
         });
       }
       toast.success("Personal actualizado correctamente");
@@ -748,6 +751,12 @@ function PersonalContent() {
                                 }>
                                   {u.rol}
                                 </Badge>
+                                {personal?.memorandos?.filter(m => typeof m === 'string' && m.trim() !== "").length > 0 && (
+                                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-[9px] mt-1 flex gap-1 items-center w-fit">
+                                    <AlertCircle className="w-3 h-3" />
+                                    {personal.memorandos.filter(m => typeof m === 'string' && m.trim() !== "").length} Memorando(s)
+                                  </Badge>
+                                )}
                                 {personal && (
                                   <span className="text-xs text-muted-foreground font-medium flex items-center gap-1 mt-1" title={personal.cargo}>
                                     <Briefcase className="h-3 w-3" /> {personal.cargo} ({personal.tipoPersonal})
@@ -1054,7 +1063,19 @@ function PersonalContent() {
 
                       <div className="space-y-2">
                         <label className="text-xs font-semibold uppercase text-muted-foreground">Salario u Honorario</label>
-                        <Input value={formData.salario} onChange={e => setFormData({ ...formData, salario: e.target.value })} placeholder="Ej. $ 1.500.000" />
+                        <Input 
+                          value={formData.salario} 
+                          onChange={e => {
+                            let val = e.target.value.replace(/\D/g, "");
+                            if (!val) {
+                              setFormData({ ...formData, salario: "" });
+                            } else {
+                              const formatted = "$ " + parseInt(val, 10).toLocaleString("es-CO");
+                              setFormData({ ...formData, salario: formatted });
+                            }
+                          }} 
+                          placeholder="Ej. $ 1.500.000" 
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -1261,6 +1282,32 @@ function PersonalContent() {
                     </div>
                   </div>
 
+                  {/* ANOTACIONES DE MEMORANDO */}
+                  <div className="pt-8 border-t">
+                    <h3 className="text-sm font-bold text-destructive border-b pb-2 flex items-center gap-2 mb-4">
+                      <AlertCircle className="w-4 h-4" /> Anotaciones de Memorando
+                    </h3>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-4">Máximo tres anotaciones formales. Se visualizarán en el expediente.</p>
+                    
+                    <div className="space-y-3">
+                      {[0, 1, 2].map((idx) => (
+                        <div key={idx} className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold uppercase text-muted-foreground">Memorando {idx + 1}</label>
+                          <Input
+                            value={formData.memorandos?.[idx] || ""}
+                            onChange={(e) => {
+                              const newMemorandos = [...(formData.memorandos || [])];
+                              newMemorandos[idx] = e.target.value;
+                              setFormData({ ...formData, memorandos: newMemorandos });
+                            }}
+                            placeholder={idx === 0 ? "Ej. Llamado de atención por llegadas tarde..." : "Opcional"}
+                            disabled={creando}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="flex justify-end gap-3 pt-6 border-t">
                     <Button type="button" variant="outline" onClick={() => { setView("table"); setIsEditing(false); setPermitirModificarNiup(false); setEditId(null); }} disabled={creando}>Cancelar</Button>
                     <Button type="submit" className="min-w-[150px]" disabled={creando}>
@@ -1436,14 +1483,7 @@ function PersonalContent() {
               style={{ width: '380px', height: '580px', background: '#ffffff', position: 'relative', overflow: 'hidden', borderRadius: '32px', fontFamily: 'sans-serif' }}
             >
               {/* Decoración Superior Tierra */}
-              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '180px', overflow: 'hidden' }}>
-                <div style={{
-                  position: 'absolute', top: '-40px', left: '-40px', width: '120%', height: '120%',
-                  transform: 'rotate(15deg)', background: `linear-gradient(135deg, #5c4033 0%, #8b5a2b 100%)`
-                }} />
-                <div
-                  style={{ position: 'absolute', top: 0, right: 0, width: '33%', height: '100%', backgroundColor: '#cd853f', opacity: 0.3, clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
-                />
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '180px', overflow: 'hidden', background: `linear-gradient(135deg, #5c4033 0%, #8b5a2b 100%)` }}>
               </div>
 
               {/* Logo y Encabezado */}
