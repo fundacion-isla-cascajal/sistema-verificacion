@@ -1908,11 +1908,11 @@ function DashboardContent() {
                 </div>
               </div>
 
-              <div style={{ textAlign: "center", marginBottom: "40px" }}>
-                <h2 style={{ fontSize: "22px", fontWeight: "bold", textDecoration: "underline", margin: 0 }}>CERTIFICADO DE AVAL EDUCATIVO</h2>
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <h2 style={{ fontSize: "20px", fontWeight: "bold", textDecoration: "underline", margin: 0 }}>CERTIFICADO DE AVAL EDUCATIVO</h2>
               </div>
 
-              <div style={{ fontSize: "16px", textAlign: "justify" }}>
+              <div style={{ fontSize: "14px", textAlign: "justify" }}>
                 <p>
                   La presente organización de base denominada FUNDACIÓN ISLA CASCAJAL “FICong”, identificada con NIT: 900.248.351-0, con domicilio principal en el Distrito de Santiago de Cali, República de Colombia, se permite presentar a <strong>{currentCertData.persona.nombre}</strong> con NUIP. <strong>{currentCertData.persona.cedula}</strong>, quien cuenta con registro oficial en nuestra base de datos institucional y con membresía activa para acceder a nuestros convenios educativos.
                 </p>
@@ -1926,12 +1926,12 @@ function DashboardContent() {
                 </p>
               </div>
 
-              <div style={{ marginTop: "60px", paddingBottom: "20px" }}>
+              <div style={{ marginTop: "20px", paddingBottom: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-                  <img src="/firma.png" alt="Firma" style={{ height: "60px", marginBottom: "5px" }} onError={(e) => e.target.style.display = 'none'} />
+                  <img src="/firma.jpeg" alt="Firma" style={{ height: "60px", marginBottom: "5px" }} onError={(e) => e.target.style.display = 'none'} />
                   <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px" }}>Diana C. Rojas V.</p>
                   <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px" }}>Directora Administrativa</p>
-                  <p style={{ margin: 0, fontSize: "14px", fontStyle: "italic" }}>Fundación Isla Cascajal</p>
+                  <p style={{ margin: 0, fontSize: "12px", fontStyle: "italic" }}>Fundación Isla Cascajal</p>
                   <p style={{ margin: 0, fontSize: "10px", fontStyle: "italic" }}>Documento electrónico verificable con el código QR.</p>
                 </div>
               </div>
@@ -1958,11 +1958,11 @@ function DashboardContent() {
                 </div>
               </div>
 
-              <div style={{ textAlign: "center", marginBottom: "40px" }}>
-                <h2 style={{ fontSize: "22px", fontWeight: "bold", textDecoration: "underline", margin: 0 }}>CERTIFICADO DE AFILIACIÓN INTEGRAL</h2>
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <h2 style={{ fontSize: "20px", fontWeight: "bold", textDecoration: "underline", margin: 0 }}>CERTIFICADO DE AFILIACIÓN INTEGRAL</h2>
               </div>
 
-              <div style={{ fontSize: "16px", textAlign: "justify" }}>
+              <div style={{ fontSize: "14px", textAlign: "justify" }}>
                 <p>
                   La presente organización de base denominada FUNDACIÓN ISLA CASCAJAL “FICong”, identificada con NIT: 900.248.351-0, con domicilio principal en el Distrito de Santiago de Cali, República de Colombia, se permite presentar a <strong>{currentCertData.persona.nombre}</strong> con NUIP. <strong>{currentCertData.persona.cedula}</strong>, bajo el código institucional <strong>{currentCertData.persona.codigo}</strong> y le permite acceder a los descuentos que otorgan nuestros convenios interinstitucionales.
                 </p>
@@ -1973,11 +1973,11 @@ function DashboardContent() {
               </div>
 
               {currentCertData.persona.beneficiarios?.length > 0 && (
-                <div style={{ marginTop: "30px", border: "1px solid #000", padding: "10px", paddingBottom: "15px" }}>
-                  <p style={{ color: "#0070C0", margin: 0, marginBottom: "15px", fontSize: "14px" }}>BENEFICIARIOS:</p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div style={{ marginTop: "15px", border: "1px solid #000", padding: "8px", paddingBottom: "10px" }}>
+                  <p style={{ color: "#0070C0", margin: 0, marginBottom: "8px", fontSize: "12px", fontWeight: "bold" }}>BENEFICIARIOS:</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     {currentCertData.persona.beneficiarios.map((b, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", paddingRight: "40px" }}>
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", paddingRight: "20px" }}>
                         <span>{b.nombre}</span>
                         <span>NUIP: {b.nuip || "Sin registro"}</span>
                       </div>
@@ -1987,11 +1987,11 @@ function DashboardContent() {
               )}
 
               {currentCertData.persona.mascotas?.length > 0 && (
-                <div style={{ marginTop: "15px", border: "1px solid #000", padding: "10px", paddingBottom: "15px" }}>
-                  <p style={{ color: "#0070C0", margin: 0, marginBottom: "15px", fontSize: "14px" }}>MASCOTAS (PLAN INTEGRAL):</p>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <div style={{ marginTop: "10px", border: "1px solid #000", padding: "8px", paddingBottom: "10px" }}>
+                  <p style={{ color: "#0070C0", margin: 0, marginBottom: "8px", fontSize: "12px", fontWeight: "bold" }}>MASCOTAS (PLAN INTEGRAL):</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                     {currentCertData.persona.mascotas.map((m, i) => (
-                      <div key={i} style={{ fontSize: "12px" }}>
+                      <div key={i} style={{ fontSize: "11px" }}>
                         {m.nombre} ({m.tipo}{m.raza ? ` - ${m.raza}` : ''})
                       </div>
                     ))}
@@ -1999,13 +1999,13 @@ function DashboardContent() {
                 </div>
               )}
 
-              <div style={{ marginTop: "40px", paddingBottom: "20px" }}>
-                <p style={{ margin: 0, fontSize: "14px", marginBottom: "50px" }}>El presente documento se expide a los {new Date().getDate().toString().padStart(2, '0')} días del mes de {new Date().toLocaleString('es-CO', { month: 'long' })} de {new Date().getFullYear()} en Santiago de Cali.</p>
+              <div style={{ marginTop: "20px", paddingBottom: "10px" }}>
+                <p style={{ margin: 0, fontSize: "12px", marginBottom: "20px" }}>El presente documento se expide a los {new Date().getDate().toString().padStart(2, '0')} días del mes de {new Date().toLocaleString('es-CO', { month: 'long' })} de {new Date().getFullYear()} en Santiago de Cali.</p>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-                  <img src="/firma.png" alt="Firma" style={{ height: "60px", marginBottom: "5px" }} onError={(e) => e.target.style.display = 'none'} />
+                  <img src="/firma.jpeg" alt="Firma" style={{ height: "60px", marginBottom: "5px" }} onError={(e) => e.target.style.display = 'none'} />
                   <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px" }}>Diana C. Rojas V.</p>
                   <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px" }}>Directora Administrativa</p>
-                  <p style={{ margin: 0, fontSize: "14px", fontStyle: "italic" }}>Fundación Isla Cascajal</p>
+                  <p style={{ margin: 0, fontSize: "12px", fontStyle: "italic" }}>Fundación Isla Cascajal</p>
                   <p style={{ margin: 0, fontSize: "10px", fontStyle: "italic" }}>Documento electrónico verificable con el código QR.</p>
                 </div>
               </div>
