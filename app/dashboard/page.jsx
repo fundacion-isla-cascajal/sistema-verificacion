@@ -1914,32 +1914,23 @@ function DashboardContent() {
 
               <div style={{ fontSize: "16px", textAlign: "justify" }}>
                 <p>
-                  La presente organización de base <strong>Fundación Isla Cascajal “FICong”</strong>, identificada con NIT 900.248.351-0, con principal domicilio en el Distrito Especial de Santiago de Cali, República de Colombia, se permite presentar a:
-                </p>
-                
-                <p style={{ fontSize: "20px", fontWeight: "900", textAlign: "center", margin: "25px 0", textTransform: "uppercase" }}>
-                  {currentCertData.persona.nombre}
+                  La presente organización de base denominada FUNDACIÓN ISLA CASCAJAL “FICong”, identificada con NIT: 900.248.351-0, con domicilio principal en el Distrito de Santiago de Cali, República de Colombia, se permite presentar a <strong>{currentCertData.persona.nombre}</strong> con NUIP. <strong>{currentCertData.persona.cedula}</strong>, quien cuenta con registro oficial en nuestra base de datos institucional y con membresía activa para acceder a nuestros convenios educativos.
                 </p>
 
                 <p>
-                  con NIUP <strong>{currentCertData.persona.cedula}</strong>, quien cuenta con registro oficial en nuestra base de datos institucional y con afiliación activa para acceder a nuestros convenios educativos.
+                  Esta membresía fue realizada el día {formatearFecha(currentCertData.persona.fechaCreacion || currentCertData.persona.fechaIngreso)}, bajo el código institucional <strong>{currentCertData.persona.codigo}</strong> y tiene validez y cobertura para los convenios Nacionales e Internacionales y le permite acceder a los programas, actividades y procesos académicos establecidos y ofertados por los aliados estratégicos de la Fundación Isla Cascajal y por ella misma.
                 </p>
 
                 <p>
-                  Esta afiliación fue realizada en día <strong>{formatearFecha(currentCertData.persona.fechaCreacion || currentCertData.persona.fechaIngreso)}</strong>, bajo el código institucional <strong>{currentCertData.persona.codigo}</strong> y tiene validez y cobertura para los convenios Nacionales e Internacionales y le permite acceder a los programas, actividades y procesos académicos establecidos por la Fundación Isla Cascajal.
-                </p>
-
-                <p>
-                  Después de corroborar que se asumirán los compromisos académicos, sociales y morales por parte del afiliado, se procede a conceder el <strong>AVAL</strong> para que se le realicen los correspondientes descuentos para programas educativos para el período académico <strong>{getPeriodoEducativo(currentCertData.membresia.fechaExpiracion)}</strong>.
+                  Después de corroborar que se asumirán los compromisos académicos, sociales y morales por parte del titular de este documento, se procede a conceder AVAL y se le solicita a la institución educativa receptora de este documento, que, de acuerdo al convenio interinstitucional firmado por las partes, se avance en el otorgamiento de los correspondientes descuentos para programas académicos y demás servicios educativos para el período académico {getPeriodoEducativo(currentCertData.membresia.fechaExpiracion)}. El presente documento se expide a los {new Date().getDate().toString().padStart(2, '0')} días del mes de {new Date().toLocaleString('es-CO', { month: 'long' })} de {new Date().getFullYear()} en Santiago de Cali por interés del solicitante.
                 </p>
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "60px" }}>
                 <div>
-                  <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px" }}>Fundación Isla Cascajal</p>
-                  <p style={{ margin: 0, fontSize: "12px" }}>Fecha de expedición: {new Date().toLocaleDateString("es-CO")}</p>
-                  <div style={{ marginTop: "30px", width: "180px", borderBottom: "1px solid #000" }}></div>
-                  <p style={{ margin: 0, fontSize: "12px" }}>Coordinación Comercial</p>
+                  <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px", textTransform: "uppercase" }}>Dirección Administrativa</p>
+                  <p style={{ margin: 0, fontSize: "12px" }}>Fundación Isla Cascajal</p>
+                  <p style={{ margin: 0, fontSize: "12px", marginTop: "5px" }}>Documento electrónico verificable con el código QR.</p>
                 </div>
               </div>
             </div>
@@ -1971,28 +1962,20 @@ function DashboardContent() {
 
               <div style={{ fontSize: "16px", textAlign: "justify" }}>
                 <p>
-                  La presente organización de base <strong>Fundación Isla Cascajal “FICong”</strong>, identificada con NIT 900.248.351-0, con principal domicilio en el Distrito Especial de Santiago de Cali, República de Colombia, se permite presentar a:
-                </p>
-
-                <p style={{ fontSize: "20px", fontWeight: "900", textAlign: "center", margin: "25px 0", textTransform: "uppercase" }}>
-                  {currentCertData.persona.nombre}
+                  La presente organización de base denominada FUNDACIÓN ISLA CASCAJAL “FICong”, identificada con NIT: 900.248.351-0, con domicilio principal en el Distrito de Santiago de Cali, República de Colombia, se permite presentar a <strong>{currentCertData.persona.nombre}</strong> con NUIP. <strong>{currentCertData.persona.cedula}</strong>, bajo el código institucional <strong>{currentCertData.persona.codigo}</strong> y le permite acceder a los descuentos que otorgan nuestros convenios interinstitucionales.
                 </p>
 
                 <p>
-                  con NIUP <strong>{currentCertData.persona.cedula}</strong>, quien cuenta con registro oficial en nuestra base de datos institucional y con afiliación activa desde el día <strong>{formatearFecha(currentCertData.persona.fechaCreacion || currentCertData.persona.fechaIngreso)}</strong>, bajo el código institucional <strong>{currentCertData.persona.codigo}</strong> y le permite acceder a los descuentos especiales que otorgan nuestros convenios interinstitucionales.
-                </p>
-
-                <p>
-                  Esta afiliación tiene validez y cobertura para los convenios Nacionales e Internacionales y le permite acceder a los programas, actividades y procesos establecidos por la Fundación Isla Cascajal, así pues; después de corroborar que se asumirán los compromisos sociales y morales por parte del afiliado, se procede a reconocer su <strong>AFILIACIÓN ACTIVA</strong> para que se le realicen los correspondientes descuentos con fecha de vencimiento <strong>{formatearFecha(currentCertData.membresia.fechaExpiracion)}</strong>.
+                  Esta membresía tiene validez y cobertura para los convenios Nacionales e Internacionales y le permite acceder a los programas, actividades y procesos establecidos por la Fundación Isla Cascajal, así pues; después de corroborar que se asumirán los compromisos sociales y morales por parte del titular de este documento, se procede a reconocer su AFILIACIÓN ACTIVA y se le solicita a la organización receptora de este documento, que, de acuerdo al convenio interinstitucional firmado por las partes, se avance en el otorgamiento de los correspondientes descuentos especiales tanto al titular de la membresía como a sus beneficiarios y mascotas hasta las 11:59 p.m. del día {formatearFecha(currentCertData.membresia.fechaExpiracion)}.
                 </p>
               </div>
 
               {currentCertData.persona.beneficiarios?.length > 0 && (
                 <div style={{ marginTop: "30px", padding: "15px", border: "1px solid #eee", borderRadius: "8px" }}>
-                  <p style={{ fontSize: "12px", fontWeight: "bold", marginBottom: "8px", color: COLORS.azul }}>BENEFICIARIOS:</p>
+                  <p style={{ fontSize: "12px", fontWeight: "bold", marginBottom: "8px", color: COLORS.azul }}>BENEFICIARIOS AUTORIZADOS:</p>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                     {currentCertData.persona.beneficiarios.map((b, i) => (
-                      <p key={i} style={{ fontSize: "11px", margin: 0 }}>• {b.nombre}</p>
+                      <p key={i} style={{ fontSize: "11px", margin: 0 }}>• {b.nombre} - NUIP: {b.nuip || "Sin registro"}</p>
                     ))}
                   </div>
                 </div>
@@ -2013,10 +1996,10 @@ function DashboardContent() {
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "60px" }}>
                 <div>
-                  <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px" }}>Fundación Isla Cascajal</p>
-                  <p style={{ margin: 0, fontSize: "12px" }}>Fecha de expedición: {new Date().toLocaleDateString("es-CO")}</p>
-                  <div style={{ marginTop: "30px", width: "180px", borderBottom: "1px solid #000" }}></div>
-                  <p style={{ margin: 0, fontSize: "12px" }}>Coordinación Comercial</p>
+                  <p style={{ margin: 0, fontSize: "14px" }}>El presente documento se expide a los {new Date().getDate().toString().padStart(2, '0')} días del mes de {new Date().toLocaleString('es-CO', { month: 'long' })} de {new Date().getFullYear()} en Santiago de Cali.</p>
+                  <p style={{ margin: 0, fontWeight: "bold", fontSize: "14px", marginTop: "15px", textTransform: "uppercase" }}>Dirección Administrativa</p>
+                  <p style={{ margin: 0, fontSize: "12px" }}>Fundación Isla Cascajal</p>
+                  <p style={{ margin: 0, fontSize: "12px", marginTop: "5px" }}>Documento electrónico verificable con el código QR.</p>
                 </div>
               </div>
             </div>

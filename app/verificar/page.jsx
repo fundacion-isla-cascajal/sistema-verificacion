@@ -301,17 +301,18 @@ function VerificarContent() {
                     </p>
                     <div className="space-y-2">
                       {documento.membresias?.map((m, idx) => {
-                        const expired = m.fechaExpiracion !== "indefinida" && new Date() > new Date(m.fechaExpiracion);
+                        const isDateExpired = m.fechaExpiracion !== "indefinida" && new Date() > new Date(m.fechaExpiracion);
+                        const expired = isDateExpired || documento.estado === "inactivo";
                         return (
                           <div key={idx} className="flex justify-between items-center p-2 bg-white rounded-lg border shadow-sm">
                             <div className="flex flex-col">
                               <span className="text-xs font-bold uppercase">{m.tipo}</span>
                               <span className="text-[10px] text-muted-foreground">
-                                {m.fechaExpiracion === "indefinida" ? "Vigencia: Indefinida" : `Vence: ${formatearFecha(m.fechaExpiracion)}`}
+                                {documento.estado === "inactivo" ? "Vigencia Cancelada (Inactivo)" : (m.fechaExpiracion === "indefinida" ? "Vigencia: Indefinida" : `Vence: ${formatearFecha(m.fechaExpiracion)}`)}
                               </span>
                             </div>
                             <Badge variant={expired ? "destructive" : "default"} className="text-[9px] h-5">
-                              {expired ? "VENCIDA" : "VIGENTE"}
+                              {expired ? (documento.estado === "inactivo" ? "CANCELADA" : "VENCIDA") : "VIGENTE"}
                             </Badge>
                           </div>
                         );
@@ -331,8 +332,9 @@ function VerificarContent() {
                     </p>
                     <div className="grid grid-cols-1 gap-1">
                       {documento.beneficiarios.map((ben, idx) => (
-                        <p key={idx} className="text-xs font-medium pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-primary">
-                          {ben.nombre}
+                        <p key={idx} className="text-xs font-medium pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-primary flex justify-between items-center">
+                          <span>{ben.nombre}</span>
+                          <span className="text-[10px] font-mono text-muted-foreground ml-2">NUIP: {ben.nuip || "Sin registro"}</span>
                         </p>
                       ))}
                     </div>
