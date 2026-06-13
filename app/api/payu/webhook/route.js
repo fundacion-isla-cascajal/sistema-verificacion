@@ -66,7 +66,7 @@ export async function POST(request) {
         }, { merge: true });
 
         // 4. Enviar Correo Automático vía Resend
-        const resendApiKey = process.env.RESEND_API_KEY || "re_bpqPzvq2_pP1fBMrRKdKD1cEdHenz9kTA";
+        const resendApiKey = process.env.RESEND_API_KEY;
         
         const emailHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">

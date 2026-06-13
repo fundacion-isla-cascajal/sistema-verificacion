@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { HelpCircle, Search, ChevronDown } from "lucide-react";
 import { 
   Sheet, 
@@ -21,7 +22,17 @@ import { Button } from "@/components/ui/button";
 import { helpCategories } from "@/lib/help-data";
 
 export function HelpWidget() {
+  const pathname = usePathname();
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Ocultar widget en pantallas de enfoque
+  if (
+    pathname?.startsWith('/registro') ||
+    pathname?.startsWith('/afiliado') ||
+    pathname?.startsWith('/login')
+  ) {
+    return null;
+  }
 
   const filteredCategories = helpCategories.map(cat => {
     const filteredItems = cat.items.filter(item => 

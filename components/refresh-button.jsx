@@ -1,11 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function RefreshButton() {
+  const pathname = usePathname();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Ocultar botón en pantallas específicas para evitar distracciones
+  if (
+    pathname?.startsWith('/registro') ||
+    pathname?.startsWith('/afiliado') ||
+    pathname?.startsWith('/login')
+  ) {
+    return null;
+  }
 
   const handleRefresh = () => {
     setIsRefreshing(true);
