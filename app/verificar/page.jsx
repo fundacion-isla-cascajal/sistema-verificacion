@@ -46,60 +46,72 @@ function VerificarContent() {
       try {
         let docData = null;
 
-        // 1. Buscar en 'afiliados'
-        let afiliadoDoc = null;
-        const afiliadoById = await getDoc(doc(db, "afiliados", codigo));
-        if (afiliadoById.exists()) {
-          afiliadoDoc = afiliadoById;
-        } else {
-          const afiQ1 = query(collection(db, "afiliados"), where("codigo", "==", codigo));
-          const snap1 = await getDocs(afiQ1);
-          if (!snap1.empty) {
-            afiliadoDoc = snap1.docs[0];
-          } else {
-            const afiQ2 = query(collection(db, "afiliados"), where("codigoInstitucional", "==", codigo));
-            const snap2 = await getDocs(afiQ2);
-            if (!snap2.empty) afiliadoDoc = snap2.docs[0];
+        // 1. Búsqueda exacta en Documentos (Certificados)
+        try {
+          const docRef = doc(db, "documentos", codigo);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            docData = { codigo: docSnap.id, ...docSnap.data(), tipo: "certificado" };
           }
+        } catch (e) { console.warn("Fallo búsqueda en documentos:", e); }
+
+        // 2. Búsqueda exacta en Afiliados
+        if (!docData) {
+          try {
+            const afiliadoById = await getDoc(doc(db, "afiliados", codigo));
+            if (afiliadoById.exists()) {
+              docData = { 
+                codigo: afiliadoById.data().codigo || afiliadoById.data().codigoInstitucional || afiliadoById.id, 
+                tipo: "afiliado", 
+                ...afiliadoById.data() 
+              };
+            }
+          } catch (e) { console.warn("Fallo búsqueda directa en afiliados:", e); }
         }
 
-        if (afiliadoDoc) {
-          docData = { 
-            codigo: afiliadoDoc.data().codigo || afiliadoDoc.data().codigoInstitucional || afiliadoDoc.id, 
-            tipo: "afiliado", 
-            ...afiliadoDoc.data() 
-          };
-        } else {
-          // 2. Buscar en 'empleados' por codigoInstitucional (exacto tal como fue guardado)
-          // Intentar con el valor tal como viene, y también en mayúsculas
-          let empSnap = null;
-          const empQueryUpper = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigo));
-          empSnap = await getDocs(empQueryUpper);
-
-          if (empSnap.empty && codigoRaw) {
-            // Intentar con el valor original sin transformar
-            const empQueryRaw = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigoRaw));
-            empSnap = await getDocs(empQueryRaw);
-          }
-
-          if (!empSnap.empty) {
-            const empDoc = empSnap.docs[0];
-            docData = {
-              codigo: empDoc.data().codigoInstitucional,
-              tipo: "afiliado",
-              esPersonalInstitucional: true,
-              cedula: empDoc.data().documento,
-              estado: empDoc.data().estado || "activo",
-              ...empDoc.data()
-            };
-          } else {
-            // 3. Buscar en 'documentos' (Certificados, etc)
-            const docRef = doc(db, "documentos", codigo);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              docData = { codigo: docSnap.id, ...docSnap.data(), tipo: "certificado" };
+        // 3. Búsqueda profunda en Afiliados (por campos, puede fallar si no hay sesión por reglas de seguridad)
+        if (!docData) {
+          try {
+            const afiQ1 = query(collection(db, "afiliados"), where("codigo", "==", codigo));
+            const snap1 = await getDocs(afiQ1);
+            if (!snap1.empty) {
+              const afi = snap1.docs[0];
+              docData = { codigo: afi.data().codigo || afi.data().codigoInstitucional || afi.id, tipo: "afiliado", ...afi.data() };
+            } else {
+              const afiQ2 = query(collection(db, "afiliados"), where("codigoInstitucional", "==", codigo));
+              const snap2 = await getDocs(afiQ2);
+              if (!snap2.empty) {
+                const afi = snap2.docs[0];
+                docData = { codigo: afi.data().codigo || afi.data().codigoInstitucional || afi.id, tipo: "afiliado", ...afi.data() };
+              }
             }
-          }
+          } catch (e) { console.warn("Escaneo de afiliados bloqueado por seguridad:", e); }
+        }
+
+        // 4. Búsqueda en Empleados (Personal Institucional)
+        if (!docData) {
+          try {
+            let empSnap = null;
+            const empQueryUpper = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigo));
+            empSnap = await getDocs(empQueryUpper);
+
+            if (empSnap.empty && codigoRaw) {
+              const empQueryRaw = query(collection(db, "empleados"), where("codigoInstitucional", "==", codigoRaw));
+              empSnap = await getDocs(empQueryRaw);
+            }
+
+            if (!empSnap.empty) {
+              const empDoc = empSnap.docs[0];
+              docData = {
+                codigo: empDoc.data().codigoInstitucional,
+                tipo: "afiliado",
+                esPersonalInstitucional: true,
+                cedula: empDoc.data().documento,
+                estado: empDoc.data().estado || "activo",
+                ...empDoc.data()
+              };
+            }
+          } catch (e) { console.warn("Escaneo de empleados bloqueado por seguridad:", e); }
         }
 
         if (docData) {
