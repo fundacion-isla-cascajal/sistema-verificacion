@@ -60,9 +60,9 @@ const DEPARTAMENTOS_COLOMBIA = [
 
 const ETNIAS = ["Afrodiaspórico (Negro)", "Afrodiaspórico (Afro)", "Afrodiaspórico (Palenquero)", "Afrodiaspórico (Raizal)", "Originario (Indígena)", "Mestizo", "ROM", "Caucásico (Blanco)"];
 const TIPOS_VICTIMA = ["Desplazamiento", "Homicidio", "Amenazas", "Desaparición forzosa", "Pérdida de bienes", "Atentados", "Secuestros", "Delitos contra la libertad sexual", "Daños por explosivos", "Abandono o expulsión de tierras", "Torturas", "Reclutamiento de NNA"];
-const TIPOS_DISCRIMINACION = ["Raza", "Por país de origen", "Por lugar de nacimiento", "Lugar de origen/procedencia/destino", "Por género", "Por religión", "Por discapacidad", "Por identidad cultural", "Por identidad ideológica", "Por situación socioeconómica", "Por nivel académico", "Por edad", "Por situación de salud", "Por condición familiar", "Por aspecto físico"];
-const NIVELES_EDUCATIVOS = ["Ninguno", "Primaria", "Bachiller", "Técnico", "Tecnólogo", "Pregrado (Universitario)", "Especialización o posgrado", "Maestría", "Doctorado", "Posdoctorado"];
-const TIPOS_DISCAPACIDAD = ["Múltiple", "Auditiva", "Visual", "Física", "Intelectual", "Psicosocial", "Del habla", "Por establecer", "Otro"];
+const TIPOS_DISCRIMINACION = ["Raza", "Por país de origen", "Por lugar de nacimiento", "Por género", "Por religión", "Por discapacidad", "Por identidad cultural", "Por identidad ideológica", "Por situación socioeconómica", "Por nivel académico", "Por edad", "Por situación de salud", "Por condición familiar", "Por aspecto físico"];
+const NIVELES_EDUCATIVOS = ["Primaria", "Bachiller", "Técnico", "Tecnólogo", "Pregrado (Universitario)", "Especialización o posgrado", "Maestría", "Doctorado", "Posdoctorado"];
+const TIPOS_DISCAPACIDAD = ["Múltiple", "Auditiva", "Visual", "Física", "Intelectual", "Psicosocial", "Del habla", "Por establecer"];
 const TIPOS_TRASTORNO = ["Dislexia", "Autismo", "De la percepción visual", "De la memoria", "Por establecer", "Otro"];
 
 // Colores Institucionales
@@ -123,14 +123,12 @@ export default function AfiliarPage() {
     },
     // Nuevos Campos Perfil (Igual a /registro)
     sexo: "", orientacionSexual: "", orientacionOtro: "", estrato: "", etnia: "",
-    sisben: "", sisbenPuntaje: "", victimaConflicto: "", victimaTipo: "", victimaInscrito: "",
+    sisben: "", victimaConflicto: "", victimaTipo: "", victimaInscrito: "",
     discriminacion: "", discriminacionTipo: "",
     educacionNivel: "", educacionEstudio: "", educacionSemestre: "", educacionPlantel: "",
     eps: "", arl: "", enfermedad: "", enfermedadCual: "", alergia: "", alergiaCual: "",
-    discapacidad: "", discapacidadTipo: "", discapacidadOtro: "", trastorno: "", trastornoTipo: "", trastornoOtro: "",
+    discapacidad: "", discapacidadTipo: "", trastorno: "", trastornoTipo: "", trastornoOtro: "",
     comoEntero: "", referido: "",
-    deseaSerVoluntario: "",
-    emergenciaNombre: "", emergenciaNumero: "", emergenciaCorreo: "", emergenciaCedula: "", emergenciaDireccion: "",
   });
 
   const [showExtraInfo, setShowExtraInfo] = useState(false);
@@ -291,8 +289,8 @@ export default function AfiliarPage() {
 
     // Validar Encuesta Extendida Obligatoria
     const camposEncuesta = ["sexo", "orientacionSexual", "estrato", "etnia", "sisben", "victimaConflicto", "discriminacion", "educacionNivel", "eps", "arl", "enfermedad", "alergia", "discapacidad", "trastorno"];
-    for(const campo of camposEncuesta) {
-      if(!formData[campo]) {
+    for (const campo of camposEncuesta) {
+      if (!formData[campo]) {
         setShowExtraInfo(true);
         return toast.error("La información demográfica (Perfil, Salud, Educación) es obligatoria.");
       }
@@ -373,23 +371,22 @@ export default function AfiliarPage() {
         estado: "activo",
         membresias: nuevasMembresias,
         fechaUltimaActualizacion: new Date().toISOString(),
-        
+
         // Datos de Perfilado
         sexo: formData.sexo,
         orientacionSexual: formData.orientacionSexual === "Otro" ? formData.orientacionOtro : formData.orientacionSexual,
         estrato: formData.estrato,
         etnia: formData.etnia,
         sisben: formData.sisben,
-        sisbenPuntaje: formData.sisben === "Sí" ? formData.sisbenPuntaje : "N/A",
         victimaConflicto: formData.victimaConflicto,
         victimaTipo: formData.victimaConflicto === "Sí" ? formData.victimaTipo : "N/A",
         victimaInscrito: formData.victimaConflicto === "Sí" ? formData.victimaInscrito : "N/A",
         discriminacion: formData.discriminacion,
         discriminacionTipo: formData.discriminacion === "Sí" ? formData.discriminacionTipo : "N/A",
         educacionNivel: formData.educacionNivel,
-        educacionEstudio: formData.educacionNivel === "Ninguno" ? "N/A" : (formData.educacionEstudio || "N/A"),
-        educacionSemestre: formData.educacionNivel === "Ninguno" ? "N/A" : (formData.educacionSemestre || "N/A"),
-        educacionPlantel: formData.educacionNivel === "Ninguno" ? "N/A" : (formData.educacionPlantel || "N/A"),
+        educacionEstudio: formData.educacionEstudio || "N/A",
+        educacionSemestre: formData.educacionSemestre || "N/A",
+        educacionPlantel: formData.educacionPlantel || "N/A",
         eps: formData.eps,
         arl: formData.arl,
         enfermedad: formData.enfermedad,
@@ -397,17 +394,11 @@ export default function AfiliarPage() {
         alergia: formData.alergia,
         alergiaCual: formData.alergia === "Sí" ? formData.alergiaCual : "N/A",
         discapacidad: formData.discapacidad,
-        discapacidadTipo: formData.discapacidad === "Sí" ? (formData.discapacidadTipo === "Otro" ? formData.discapacidadOtro : formData.discapacidadTipo) : "N/A",
+        discapacidadTipo: formData.discapacidad === "Sí" ? formData.discapacidadTipo : "N/A",
         trastorno: formData.trastorno,
         trastornoTipo: formData.trastorno === "Sí" ? (formData.trastornoTipo === "Otro" ? formData.trastornoOtro : formData.trastornoTipo) : "N/A",
         comoEntero: formData.comoEntero,
         referido: formData.comoEntero === "Referido" ? formData.referido : "N/A",
-        deseaSerVoluntario: formData.deseaSerVoluntario,
-        emergenciaNombre: formData.deseaSerVoluntario === "Sí" ? formData.emergenciaNombre : "N/A",
-        emergenciaNumero: formData.deseaSerVoluntario === "Sí" ? formData.emergenciaNumero : "N/A",
-        emergenciaCorreo: formData.deseaSerVoluntario === "Sí" ? formData.emergenciaCorreo : "N/A",
-        emergenciaCedula: formData.deseaSerVoluntario === "Sí" ? formData.emergenciaCedula : "N/A",
-        emergenciaDireccion: formData.deseaSerVoluntario === "Sí" ? formData.emergenciaDireccion : "N/A",
       };
 
       if (!snap.empty) {
@@ -1049,25 +1040,17 @@ export default function AfiliarPage() {
                           <h2 className="text-lg font-bold" style={{ color: "#ca8a04" }}>Contexto Social y Vulnerabilidad</h2>
                         </div>
                         <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-3">
-                            <Field>
-                              <FieldLabel>¿Tiene Sisbén? <span className="text-red-500">*</span></FieldLabel>
-                              <Select value={formData.sisben} onValueChange={(v) => { handleInputChange("sisben", v); if(v==="No") handleInputChange("sisbenPuntaje", ""); }}>
-                                <SelectTrigger className="border-yellow-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
-                                <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
-                              </Select>
-                            </Field>
-                            {formData.sisben === "Sí" && (
-                              <Field>
-                                <FieldLabel>Puntaje / Categoría <span className="text-red-500">*</span></FieldLabel>
-                                <Input placeholder="Ej. A1, B2" value={formData.sisbenPuntaje} onChange={(e) => handleInputChange("sisbenPuntaje", e.target.value)} className="border-yellow-200" />
-                              </Field>
-                            )}
-                          </div>
-                          
+                          <Field>
+                            <FieldLabel>¿Tiene Sisbén? <span className="text-red-500">*</span></FieldLabel>
+                            <Select value={formData.sisben} onValueChange={(v) => handleInputChange("sisben", v)}>
+                              <SelectTrigger className="border-yellow-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
+                              <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
+                            </Select>
+                          </Field>
+
                           <Field className="md:col-span-2 border-t pt-3 border-yellow-100">
                             <FieldLabel>¿Es víctima del conflicto armado? <span className="text-red-500">*</span></FieldLabel>
-                            <Select value={formData.victimaConflicto} onValueChange={(v) => { handleInputChange("victimaConflicto", v); if(v==="No") { handleInputChange("victimaTipo",""); handleInputChange("victimaInscrito",""); } }}>
+                            <Select value={formData.victimaConflicto} onValueChange={(v) => { handleInputChange("victimaConflicto", v); if (v === "No") { handleInputChange("victimaTipo", ""); handleInputChange("victimaInscrito", ""); } }}>
                               <SelectTrigger className="border-yellow-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                               <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
                             </Select>
@@ -1096,7 +1079,7 @@ export default function AfiliarPage() {
 
                           <Field className="md:col-span-2 border-t pt-3 border-yellow-100">
                             <FieldLabel>¿Es víctima de discriminación? <span className="text-red-500">*</span></FieldLabel>
-                            <Select value={formData.discriminacion} onValueChange={(v) => { handleInputChange("discriminacion", v); if(v==="No") handleInputChange("discriminacionTipo", ""); }}>
+                            <Select value={formData.discriminacion} onValueChange={(v) => { handleInputChange("discriminacion", v); if (v === "No") handleInputChange("discriminacionTipo", ""); }}>
                               <SelectTrigger className="border-yellow-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                               <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
                             </Select>
@@ -1125,40 +1108,29 @@ export default function AfiliarPage() {
                         <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                           <Field>
                             <FieldLabel>Nivel Educativo <span className="text-red-500">*</span></FieldLabel>
-                            <Select value={formData.educacionNivel} onValueChange={(v) => {
-                              handleInputChange("educacionNivel", v);
-                              if (v === "Ninguno") {
-                                handleInputChange("educacionEstudio", "");
-                                handleInputChange("educacionSemestre", "");
-                                handleInputChange("educacionPlantel", "");
-                              }
-                            }}>
+                            <Select value={formData.educacionNivel} onValueChange={(v) => handleInputChange("educacionNivel", v)}>
                               <SelectTrigger className="border-blue-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                               <SelectContent>{NIVELES_EDUCATIVOS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
                             </Select>
                           </Field>
-                          {formData.educacionNivel !== "Ninguno" && (
-                            <>
-                              <Field>
-                                <FieldLabel>¿Qué estudia/estudió?</FieldLabel>
-                                <Input placeholder="Ej. Ingeniería" value={formData.educacionEstudio} onChange={(e) => handleInputChange("educacionEstudio", e.target.value)} className="border-blue-200" />
-                              </Field>
-                              <Field>
-                                <FieldLabel>Semestre</FieldLabel>
-                                <Select value={formData.educacionSemestre} onValueChange={(v) => handleInputChange("educacionSemestre", v)}>
-                                  <SelectTrigger className="border-blue-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
-                                  <SelectContent>
-                                    {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"].map(s => <SelectItem key={s} value={`Semestre ${s}`}>Semestre {s}</SelectItem>)}
-                                    <SelectItem value="Egresado/Graduado">Egresado / Graduado</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </Field>
-                              <Field>
-                                <FieldLabel>Plantel Educativo</FieldLabel>
-                                <Input placeholder="Colegio/Universidad" value={formData.educacionPlantel} onChange={(e) => handleInputChange("educacionPlantel", e.target.value)} className="border-blue-200" />
-                              </Field>
-                            </>
-                          )}
+                          <Field>
+                            <FieldLabel>¿Qué estudia/estudió?</FieldLabel>
+                            <Input placeholder="Ej. Ingeniería" value={formData.educacionEstudio} onChange={(e) => handleInputChange("educacionEstudio", e.target.value)} className="border-blue-200" />
+                          </Field>
+                          <Field>
+                            <FieldLabel>Semestre</FieldLabel>
+                            <Select value={formData.educacionSemestre} onValueChange={(v) => handleInputChange("educacionSemestre", v)}>
+                              <SelectTrigger className="border-blue-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
+                              <SelectContent>
+                                {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"].map(s => <SelectItem key={s} value={`Semestre ${s}`}>Semestre {s}</SelectItem>)}
+                                <SelectItem value="Egresado/Graduado">Egresado / Graduado</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </Field>
+                          <Field>
+                            <FieldLabel>Plantel Educativo</FieldLabel>
+                            <Input placeholder="Colegio/Universidad" value={formData.educacionPlantel} onChange={(e) => handleInputChange("educacionPlantel", e.target.value)} className="border-blue-200" />
+                          </Field>
                         </CardContent>
                       </Card>
 
@@ -1184,7 +1156,7 @@ export default function AfiliarPage() {
                             <div className="space-y-3">
                               <Field>
                                 <FieldLabel>¿Padece enfermedad? <span className="text-red-500">*</span></FieldLabel>
-                                <Select value={formData.enfermedad} onValueChange={(v) => { handleInputChange("enfermedad", v); if(v==="No") handleInputChange("enfermedadCual", ""); }}>
+                                <Select value={formData.enfermedad} onValueChange={(v) => { handleInputChange("enfermedad", v); if (v === "No") handleInputChange("enfermedadCual", ""); }}>
                                   <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                                   <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
                                 </Select>
@@ -1199,7 +1171,7 @@ export default function AfiliarPage() {
                             <div className="space-y-3">
                               <Field>
                                 <FieldLabel>¿Padece alergia? <span className="text-red-500">*</span></FieldLabel>
-                                <Select value={formData.alergia} onValueChange={(v) => { handleInputChange("alergia", v); if(v==="No") handleInputChange("alergiaCual", ""); }}>
+                                <Select value={formData.alergia} onValueChange={(v) => { handleInputChange("alergia", v); if (v === "No") handleInputChange("alergiaCual", ""); }}>
                                   <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                                   <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
                                 </Select>
@@ -1217,7 +1189,7 @@ export default function AfiliarPage() {
                             <div className="space-y-3">
                               <Field>
                                 <FieldLabel>¿Discapacidad? <span className="text-red-500">*</span></FieldLabel>
-                                <Select value={formData.discapacidad} onValueChange={(v) => { handleInputChange("discapacidad", v); if(v==="No") handleInputChange("discapacidadTipo", ""); }}>
+                                <Select value={formData.discapacidad} onValueChange={(v) => { handleInputChange("discapacidad", v); if (v === "No") handleInputChange("discapacidadTipo", ""); }}>
                                   <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                                   <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
                                 </Select>
@@ -1225,25 +1197,20 @@ export default function AfiliarPage() {
                               {formData.discapacidad === "Sí" && (
                                 <Field>
                                   <FieldLabel>¿Tipo? <span className="text-red-500">*</span></FieldLabel>
-                                  <div className="space-y-2">
-                                    <Select value={formData.discapacidadTipo} onValueChange={(v) => handleInputChange("discapacidadTipo", v)}>
-                                      <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="Ninguna">Ninguna</SelectItem>
-                                        {TIPOS_DISCAPACIDAD.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                                      </SelectContent>
-                                    </Select>
-                                    {formData.discapacidadTipo === "Otro" && (
-                                      <Input placeholder="¿Cuál discapacidad?" value={formData.discapacidadOtro} onChange={(e) => handleInputChange("discapacidadOtro", e.target.value)} className="border-red-200" />
-                                    )}
-                                  </div>
+                                  <Select value={formData.discapacidadTipo} onValueChange={(v) => handleInputChange("discapacidadTipo", v)}>
+                                    <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Ninguna">Ninguna</SelectItem>
+                                      {TIPOS_DISCAPACIDAD.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                                    </SelectContent>
+                                  </Select>
                                 </Field>
                               )}
                             </div>
                             <div className="space-y-3">
                               <Field>
                                 <FieldLabel>¿Trastorno? <span className="text-red-500">*</span></FieldLabel>
-                                <Select value={formData.trastorno} onValueChange={(v) => { handleInputChange("trastorno", v); if(v==="No") { handleInputChange("trastornoTipo", ""); handleInputChange("trastornoOtro", ""); } }}>
+                                <Select value={formData.trastorno} onValueChange={(v) => { handleInputChange("trastorno", v); if (v === "No") { handleInputChange("trastornoTipo", ""); handleInputChange("trastornoOtro", ""); } }}>
                                   <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
                                   <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
                                 </Select>
@@ -1266,61 +1233,6 @@ export default function AfiliarPage() {
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* SECCIÓN EXTRA: VOLUNTARIADO Y EMERGENCIA */}
-                      <Card className="shadow-md border-0 overflow-hidden border-t-4" style={{ borderTopColor: COLORS.verde }}>
-                        <div className="bg-green-50/50 p-3 border-b flex items-center gap-3">
-                          <HeartHandshake className="h-5 w-5 text-green-600" />
-                          <h2 className="text-lg font-bold text-green-800">Compromiso y Voluntariado</h2>
-                        </div>
-                        <CardContent className="pt-4 space-y-4">
-                          <Field>
-                            <FieldLabel>¿Desea ser voluntario en futuras campañas de la fundación? <span className="text-red-500">*</span></FieldLabel>
-                            <Select value={formData.deseaSerVoluntario} onValueChange={(v) => {
-                              handleInputChange("deseaSerVoluntario", v);
-                              if (v === "No") {
-                                handleInputChange("emergenciaNombre", "");
-                                handleInputChange("emergenciaNumero", "");
-                                handleInputChange("emergenciaCorreo", "");
-                                handleInputChange("emergenciaCedula", "");
-                                handleInputChange("emergenciaDireccion", "");
-                              }
-                            }}>
-                              <SelectTrigger className="border-green-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
-                              <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
-                            </Select>
-                          </Field>
-
-                          {formData.deseaSerVoluntario === "Sí" && (
-                            <div className="border border-green-200 rounded-xl p-4 bg-white shadow-sm space-y-3">
-                              <h3 className="font-bold text-slate-800 border-b pb-1 text-sm">Contacto de Emergencia</h3>
-                              
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <Field>
-                                  <FieldLabel>Nombre Completo <span className="text-red-500">*</span></FieldLabel>
-                                  <Input placeholder="Nombre" value={formData.emergenciaNombre} onChange={(e) => handleInputChange("emergenciaNombre", e.target.value)} />
-                                </Field>
-                                <Field>
-                                  <FieldLabel>Número Teléfono <span className="text-red-500">*</span></FieldLabel>
-                                  <Input placeholder="Celular" value={formData.emergenciaNumero} onChange={(e) => handleInputChange("emergenciaNumero", e.target.value)} />
-                                </Field>
-                                <Field>
-                                  <FieldLabel>Correo <span className="text-red-500">*</span></FieldLabel>
-                                  <Input type="email" placeholder="correo@ejemplo.com" value={formData.emergenciaCorreo} onChange={(e) => handleInputChange("emergenciaCorreo", e.target.value)} />
-                                </Field>
-                                <Field>
-                                  <FieldLabel>Cédula <span className="text-red-500">*</span></FieldLabel>
-                                  <Input placeholder="CC" value={formData.emergenciaCedula} onChange={(e) => handleInputChange("emergenciaCedula", e.target.value)} />
-                                </Field>
-                                <Field className="md:col-span-2">
-                                  <FieldLabel>Dirección de Emergencia <span className="text-red-500">*</span></FieldLabel>
-                                  <Input placeholder="Dirección" value={formData.emergenciaDireccion} onChange={(e) => handleInputChange("emergenciaDireccion", e.target.value)} />
-                                </Field>
-                              </div>
-                            </div>
-                          )}
                         </CardContent>
                       </Card>
                     </div>
@@ -1388,7 +1300,7 @@ export default function AfiliarPage() {
                 <div className="flex-1 flex flex-col items-center pt-2 px-6 pb-2 relative">
                   {/* Logo */}
                   <img src="/logo.png" alt="Logo" style={{ width: "115px", height: "115px", borderRadius: "50%", objectFit: "contain", backgroundColor: "white" }} />
-                  
+
                   {/* Títulos Principales */}
                   <h2 className="font-black text-3xl tracking-tight mt-1" style={{ color: COLORS.verde }}>ISLA CASCAJAL</h2>
                   <p className="text-sm font-bold tracking-widest uppercase mt-[-2px]" style={{ color: '#ea580c' }}>Fundación</p>
@@ -1440,7 +1352,7 @@ export default function AfiliarPage() {
                           <p className="text-sm font-bold" style={{ color: '#ea580c' }}>{formData.rh || "A+"}</p>
                         </div>
                       </div>
-                      
+
                       <div>
                         <p className="text-[11px] font-black uppercase" style={{ color: COLORS.verde }}>País</p>
                         <p className="text-sm font-bold uppercase" style={{ color: '#ea580c' }}>{formData.pais === "Otro" ? formData.otroPais : formData.pais}</p>
@@ -1469,7 +1381,7 @@ export default function AfiliarPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Footer Username */}
                   <div className="absolute bottom-2 right-4">
                     <p className="text-xs font-bold" style={{ color: COLORS.azul }}>@fundacionislacascajal</p>
@@ -1631,99 +1543,99 @@ export default function AfiliarPage() {
           }}
         >
           <div
-                id="carnet-a-imprimir"
-                ref={carnetRef}
-                className="relative w-[380px] h-[580px] bg-white mx-auto flex flex-col rounded-[32px]"
-                style={{ overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
-              >
-                {/* Decoración Superior */}
-                <div style={{ width: '100%', height: '20px', display: 'flex', flexShrink: 0 }}>
-                  <div style={{ flex: 1, backgroundColor: '#ce181b' }} />
-                  <div style={{ flex: 1, backgroundColor: '#f3de4d' }} />
-                  <div style={{ flex: 1, backgroundColor: '#0e6235' }} />
-                  <div style={{ flex: 1, backgroundColor: '#05318a' }} />
+            id="carnet-a-imprimir"
+            ref={carnetRef}
+            className="relative w-[380px] h-[580px] bg-white mx-auto flex flex-col rounded-[32px]"
+            style={{ overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+          >
+            {/* Decoración Superior */}
+            <div style={{ width: '100%', height: '20px', display: 'flex', flexShrink: 0 }}>
+              <div style={{ flex: 1, backgroundColor: '#ce181b' }} />
+              <div style={{ flex: 1, backgroundColor: '#f3de4d' }} />
+              <div style={{ flex: 1, backgroundColor: '#0e6235' }} />
+              <div style={{ flex: 1, backgroundColor: '#05318a' }} />
+            </div>
+
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '8px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '8px', position: 'relative' }}>
+              <img src="/logo.png" alt="Logo" crossOrigin="anonymous" style={{ width: '115px', height: '115px', borderRadius: '50%', objectFit: 'contain', backgroundColor: 'white' }} />
+
+              <h2 style={{ color: '#0e6235', fontWeight: 900, fontSize: '26px', margin: 0, marginTop: '4px', lineHeight: 1.2 }}>ISLA CASCAJAL</h2>
+              <p style={{ color: '#ea580c', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', margin: 0, marginTop: '-2px', letterSpacing: '1px' }}>Fundación</p>
+
+              <div style={{ marginTop: '12px', width: '100px', height: '110px', borderRadius: '12px', backgroundColor: '#f1f5f9', border: '2px solid #e2e8f0', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                {formData.foto ? (
+                  <img src={formData.foto} alt="Foto Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
+              </div>
+
+              <div style={{ marginTop: '12px', width: '100%', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', lineHeight: 1.2, color: '#0e6235', margin: 0 }}>
+                  {formData?.nombre || "NOMBRE COMPLETO"}
+                </h3>
+                <p style={{ fontWeight: 900, fontSize: '14px', color: '#ea580c', margin: 0, marginTop: '2px' }}>
+                  NUIP. {formData?.cedula || "XXXXXXXX"}
+                </p>
+              </div>
+
+              <div style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', gap: '24px' }}>
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 900, color: '#0e6235', margin: 0 }}>CÓD. INSTITUCIONAL</p>
+                      <p style={{ fontSize: '14px', fontWeight: 900, color: '#ea580c', margin: 0 }}>{formData?.codigo || "---"}</p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '11px', fontWeight: 900, color: '#0e6235', margin: 0 }}>RH</p>
+                      <p style={{ fontSize: '14px', fontWeight: 900, color: '#ea580c', margin: 0 }}>{formData?.rh || "A+"}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: '#0e6235', margin: 0 }}>PAÍS</p>
+                    <p style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', color: '#ea580c', margin: 0 }}>{formData?.pais || "COLOMBIA"}</p>
+                  </div>
+                  <div style={{ marginTop: '4px' }}>
+                    <p style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#64748b', margin: 0, marginBottom: '4px' }}>MEMBRESÍAS ACTIVAS</p>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {formData.seleccionMembresias?.educativa && (
+                        <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#1d4ed8', backgroundColor: '#dbeafe', padding: '4px 12px', borderRadius: '12px', border: `1px solid #93c5fd` }}>
+                          EDUCATIVA
+                        </span>
+                      )}
+                      {formData.seleccionMembresias?.integral && (
+                        <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#15803d', backgroundColor: '#dcfce3', padding: '4px 12px', borderRadius: '12px', border: `1px solid #86efac` }}>
+                          INTEGRAL
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '8px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '8px', position: 'relative' }}>
-                  <img src="/logo.png" alt="Logo" crossOrigin="anonymous" style={{ width: '115px', height: '115px', borderRadius: '50%', objectFit: 'contain', backgroundColor: 'white' }} />
-                  
-                  <h2 style={{ color: '#0e6235', fontWeight: 900, fontSize: '26px', margin: 0, marginTop: '4px', lineHeight: 1.2 }}>ISLA CASCAJAL</h2>
-                  <p style={{ color: '#ea580c', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', margin: 0, marginTop: '-2px', letterSpacing: '1px' }}>Fundación</p>
-
-                  <div style={{ marginTop: '12px', width: '100px', height: '110px', borderRadius: '12px', backgroundColor: '#f1f5f9', border: '2px solid #e2e8f0', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    {formData.foto ? (
-                      <img src={formData.foto} alt="Foto Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ padding: '4px', borderRadius: '12px', border: '3px solid #854d0e', backgroundColor: 'white' }}>
+                    {qrDataUrl ? (
+                      <img src={qrDataUrl} crossOrigin="anonymous" alt="QR" style={{ width: "85px", height: "85px" }} />
                     ) : (
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                      </svg>
+                      <div style={{ width: '85px', height: '85px', backgroundColor: '#f1f5f9' }} />
                     )}
                   </div>
-
-                  <div style={{ marginTop: '12px', width: '100%', textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: 900, textTransform: 'uppercase', lineHeight: 1.2, color: '#0e6235', margin: 0 }}>
-                      {formData?.nombre || "NOMBRE COMPLETO"}
-                    </h3>
-                    <p style={{ fontWeight: 900, fontSize: '14px', color: '#ea580c', margin: 0, marginTop: '2px' }}>
-                      NUIP. {formData?.cedula || "XXXXXXXX"}
-                    </p>
-                  </div>
-
-                  <div style={{ marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 8px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', gap: '24px' }}>
-                        <div>
-                          <p style={{ fontSize: '11px', fontWeight: 900, color: '#0e6235', margin: 0 }}>CÓD. INSTITUCIONAL</p>
-                          <p style={{ fontSize: '14px', fontWeight: 900, color: '#ea580c', margin: 0 }}>{formData?.codigo || "---"}</p>
-                        </div>
-                        <div>
-                          <p style={{ fontSize: '11px', fontWeight: 900, color: '#0e6235', margin: 0 }}>RH</p>
-                          <p style={{ fontSize: '14px', fontWeight: 900, color: '#ea580c', margin: 0 }}>{formData?.rh || "A+"}</p>
-                        </div>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: '#0e6235', margin: 0 }}>PAÍS</p>
-                        <p style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', color: '#ea580c', margin: 0 }}>{formData?.pais || "COLOMBIA"}</p>
-                      </div>
-                      <div style={{ marginTop: '4px' }}>
-                        <p style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#64748b', margin: 0, marginBottom: '4px' }}>MEMBRESÍAS ACTIVAS</p>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          {formData.seleccionMembresias?.educativa && (
-                            <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#1d4ed8', backgroundColor: '#dbeafe', padding: '4px 12px', borderRadius: '12px', border: `1px solid #93c5fd` }}>
-                              EDUCATIVA
-                            </span>
-                          )}
-                          {formData.seleccionMembresias?.integral && (
-                            <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#15803d', backgroundColor: '#dcfce3', padding: '4px 12px', borderRadius: '12px', border: `1px solid #86efac` }}>
-                              INTEGRAL
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ padding: '4px', borderRadius: '12px', border: '3px solid #854d0e', backgroundColor: 'white' }}>
-                        {qrDataUrl ? (
-                          <img src={qrDataUrl} crossOrigin="anonymous" alt="QR" style={{ width: "85px", height: "85px" }} />
-                        ) : (
-                          <div style={{ width: '85px', height: '85px', backgroundColor: '#f1f5f9' }} />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ position: 'absolute', bottom: '8px', right: '16px' }}>
-                    <p style={{ fontSize: '12px', fontWeight: 900, color: '#05318a', margin: 0 }}>@fundacionislacascajal</p>
-                  </div>
-                </div>
-
-                <div style={{ width: '100%', height: '20px', display: 'flex', marginTop: 'auto', flexShrink: 0 }}>
-                  <div style={{ flex: 1, backgroundColor: '#05318a' }} />
-                  <div style={{ flex: 1, backgroundColor: '#0e6235' }} />
-                  <div style={{ flex: 1, backgroundColor: '#f3de4d' }} />
-                  <div style={{ flex: 1, backgroundColor: '#ce181b' }} />
                 </div>
               </div>
+
+              <div style={{ position: 'absolute', bottom: '8px', right: '16px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 900, color: '#05318a', margin: 0 }}>@fundacionislacascajal</p>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', height: '20px', display: 'flex', marginTop: 'auto', flexShrink: 0 }}>
+              <div style={{ flex: 1, backgroundColor: '#05318a' }} />
+              <div style={{ flex: 1, backgroundColor: '#0e6235' }} />
+              <div style={{ flex: 1, backgroundColor: '#f3de4d' }} />
+              <div style={{ flex: 1, backgroundColor: '#ce181b' }} />
+            </div>
+          </div>
         </div>
 
         {/* TEMPLATE OCULTO PARA CERTIFICADOS (Sincronizado con Dashboard) */}
