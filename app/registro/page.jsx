@@ -58,7 +58,12 @@ function generarCodigoAfiliado() {
 export default function RegistroPublicoPage() {
   const [formData, setFormData] = useState({
     codigo: generarCodigoAfiliado(),
-    nombre: "", cedula: "", rh: "", fechaIngreso: new Date().toISOString().split("T")[0],
+    nombre: "",
+    cedula: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    rh: "", fechaIngreso: new Date().toISOString().split("T")[0],
     telefono: "", correo: "", direccion: "", pais: "Colombia", otroPais: "", departamento: "", ciudad: "",
     beneficiarios: [], mascotas: [],
     seleccionMembresias: { educativa: true, integral: false },
@@ -93,7 +98,24 @@ export default function RegistroPublicoPage() {
         const numbersOnly = value.replace(/\D/g, "");
         finalValue = numbersOnly.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
       }
-      return { ...prev, [field]: finalValue };
+      const newData = { ...prev, [field]: finalValue };
+      
+      if (field === "fechaNacimiento") {
+        if (value) {
+          const birthDate = new Date(value);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          newData.edad = age >= 0 ? age.toString() : "";
+        } else {
+          newData.edad = "";
+        }
+      }
+
+      return newData;
     });
 
     if (field === "comoEntero" && value !== "Referido") {
@@ -207,7 +229,7 @@ export default function RegistroPublicoPage() {
   };
 
   const handleGuardar = async () => {
-    const camposBasicos = ["nombre", "cedula", "rh", "telefono", "correo", "direccion", "ciudad"];
+    const camposBasicos = ["nombre", "cedula", "fechaNacimiento", "lugarNacimiento", "rh", "telefono", "correo", "direccion", "ciudad"];
     const camposEncuesta = ["sexo", "orientacionSexual", "estrato", "etnia", "sisben", "victimaConflicto", "discriminacion", "educacionNivel", "eps", "arl", "enfermedad", "alergia", "discapacidad", "trastorno", "condicionEspecial", "comoEntero"];
     
     // Validar Básicos
@@ -304,8 +326,9 @@ export default function RegistroPublicoPage() {
       }
 
       let dataToSave = {
-        nombre: formData.nombre, cedula: formData.cedula, telefono: formData.telefono,
+        nombre: formData.nombre.trim(), cedula: formData.cedula.trim(), telefono: formData.telefono,
         correo: formData.correo, direccion: formData.direccion, rh: formData.rh,
+        fechaNacimiento: formData.fechaNacimiento, lugarNacimiento: formData.lugarNacimiento, edad: formData.edad,
         pais: formData.pais === "Otro" ? formData.otroPais : formData.pais,
         departamento: formData.pais === "Colombia" ? formData.departamento : "",
         ciudad: formData.ciudad,
@@ -368,8 +391,8 @@ export default function RegistroPublicoPage() {
             await updateDoc(doc(db, "afiliados", referrerDoc.id), {
               referidosExitosos: increment(1),
               listaReferidos: arrayUnion({
-                nombre: formData.nombre,
-                cedula: formData.cedula,
+                nombre: formData.nombre.trim(),
+                cedula: formData.cedula.trim(),
                 fecha: new Date().toISOString()
               })
             });
@@ -508,6 +531,18 @@ export default function RegistroPublicoPage() {
               <Field>
                 <FieldLabel>No. Identificación (NUIP) <span className="text-red-500">*</span></FieldLabel>
                 <Input value={formData.cedula} onChange={(e) => handleInputChange("cedula", e.target.value)} className="border-blue-200 focus-visible:ring-blue-500" disabled={isSaving} />
+              </Field>
+              <Field>
+                <FieldLabel>Fecha de Nacimiento <span className="text-red-500">*</span></FieldLabel>
+                <Input type="date" value={formData.fechaNacimiento} onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)} className="border-blue-200 focus-visible:ring-blue-500" disabled={isSaving} />
+              </Field>
+              <Field>
+                <FieldLabel>Lugar de Nacimiento <span className="text-red-500">*</span></FieldLabel>
+                <Input placeholder="Ej. Cali, Valle del Cauca" value={formData.lugarNacimiento} onChange={(e) => handleInputChange("lugarNacimiento", e.target.value)} className="border-blue-200 focus-visible:ring-blue-500" disabled={isSaving} />
+              </Field>
+              <Field>
+                <FieldLabel>Edad Calculada</FieldLabel>
+                <Input value={formData.edad} className="bg-slate-100 border-blue-200 text-slate-500 font-bold" readOnly placeholder="Se calcula al ingresar fecha" disabled={isSaving} />
               </Field>
               <Field>
                 <FieldLabel>Grupo Sanguíneo (RH) <span className="text-red-500">*</span></FieldLabel>

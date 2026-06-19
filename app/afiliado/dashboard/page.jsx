@@ -139,11 +139,11 @@ export default function AfiliadoDashboard() {
       usaPlanReferidos = true;
       labelPrecio = cantidadMembresias === 2 ? "Plan Referidos (Ambas)" : (tieneEdu ? "Plan Referidos (Educativa)" : "Plan Referidos (Integral)");
       aporteText = "Aporte Especial por Referidos aplicado (del 55% al 90%).";
-      precioRenovacion = cantidadMembresias === 2 ? 106999 : (tieneEdu ? 17999 : 34999);
+      precioRenovacion = cantidadMembresias === 2 ? 79999 : (tieneEdu ? 19999 : 59999);
     } else {
       labelPrecio = cantidadMembresias === 2 ? "Renovación (Ambas)" : (tieneEdu ? "Renovación Normal (Educativa)" : "Renovación Normal (Integral)");
       aporteText = "Aporte (Beca) de Renovación aplicado (del 55% al 70%).";
-      precioRenovacion = cantidadMembresias === 2 ? 149999 : (tieneEdu ? 49999 : 79999);
+      precioRenovacion = cantidadMembresias === 2 ? 119999 : (tieneEdu ? 45999 : 90999);
     }
   }
 

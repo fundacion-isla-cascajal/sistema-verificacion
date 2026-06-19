@@ -102,6 +102,9 @@ export default function AfiliarPage() {
     codigo: generarCodigoAfiliado(),
     nombre: "",
     cedula: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
     rh: "",
     fechaIngreso: new Date().toISOString().split("T")[0],
     telefono: "",
@@ -175,8 +178,23 @@ export default function AfiliarPage() {
         const numbersOnly = value.replace(/\D/g, "");
         finalValue = numbersOnly.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
       }
-
       const newData = { ...prev, [field]: finalValue };
+
+      if (field === "fechaNacimiento") {
+        if (value) {
+          const birthDate = new Date(value);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          newData.edad = age >= 0 ? age.toString() : "";
+        } else {
+          newData.edad = "";
+        }
+      }
+
       if (field === "oficina") {
         newData.dependencia = "";
       }
@@ -318,9 +336,12 @@ export default function AfiliarPage() {
 
   const handleGuardar = async () => {
     // Validar Básicos
-    if (!formData.nombre || !formData.cedula || !formData.rh || !formData.telefono || !formData.oficina || !formData.dependencia) {
-      toast.error("Por favor completa los campos básicos obligatorios");
-      return;
+    const camposBasicos = ["nombre", "cedula", "fechaNacimiento", "lugarNacimiento", "rh", "telefono", "correo", "direccion", "ciudad"];
+    for (const campo of camposBasicos) {
+      if (!formData[campo]) {
+        toast.error("Por favor completa los campos básicos obligatorios");
+        return;
+      }
     }
 
     // Validar Encuesta Extendida Obligatoria
@@ -393,18 +414,16 @@ export default function AfiliarPage() {
 
       let finalId = formData.codigo;
       let dataToSave = {
-        nombre: formData.nombre,
-        cedula: formData.cedula,
-        telefono: formData.telefono,
-        correo: formData.correo,
-        direccion: formData.direccion,
-        rh: formData.rh,
+        nombre: formData.nombre.trim(), cedula: formData.cedula.trim(), telefono: formData.telefono,
+        correo: formData.correo, direccion: formData.direccion, rh: formData.rh,
+        fechaNacimiento: formData.fechaNacimiento, lugarNacimiento: formData.lugarNacimiento, edad: formData.edad,
         foto: formData.foto,
         pais: formData.pais === "Otro" ? formData.otroPais : formData.pais,
         departamento: formData.pais === "Colombia" ? formData.departamento : "",
         ciudad: formData.ciudad,
         oficina: formData.oficina,
         dependencia: formData.dependencia,
+        cargo: formData.cargo,
         beneficiarios: formData.seleccionMembresias.integral ? formData.beneficiarios.filter(b => b.nombre.trim() !== "") : [],
         mascotas: formData.seleccionMembresias.integral ? (formData.mascotas || []).filter(m => m.nombre.trim() !== "") : [],
         estado: "activo",
@@ -693,14 +712,14 @@ export default function AfiliarPage() {
                 </div>
 
                 <Field>
-                  <FieldLabel>Nombre Completo</FieldLabel>
+                  <FieldLabel>Nombres y Apellidos Completos <span className="text-red-500">*</span></FieldLabel>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Escriba el nombre completo"
-                      className="pl-10"
+                      className="pl-10 uppercase"
                       value={formData.nombre}
-                      onChange={(e) => handleInputChange("nombre", e.target.value)}
+                      onChange={(e) => handleInputChange("nombre", e.target.value.toUpperCase())}
                       disabled={isSaving}
                     />
                   </div>
@@ -708,7 +727,7 @@ export default function AfiliarPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel>Cédula / Documento</FieldLabel>
+                    <FieldLabel>No. Identificación (NUIP) <span className="text-red-500">*</span></FieldLabel>
                     <div className="relative">
                       <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -721,7 +740,40 @@ export default function AfiliarPage() {
                     </div>
                   </Field>
                   <Field>
-                    <FieldLabel>Grupo Sanguíneo RH</FieldLabel>
+                    <FieldLabel>Fecha de Nacimiento <span className="text-red-500">*</span></FieldLabel>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="date"
+                        className="pl-10"
+                        value={formData.fechaNacimiento}
+                        onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
+                        disabled={isSaving}
+                      />
+                    </div>
+                  </Field>
+                  <Field>
+                    <FieldLabel>Lugar de Nacimiento <span className="text-red-500">*</span></FieldLabel>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Ej. Cali, Valle del Cauca"
+                        className="pl-10"
+                        value={formData.lugarNacimiento}
+                        onChange={(e) => handleInputChange("lugarNacimiento", e.target.value)}
+                        disabled={isSaving}
+                      />
+                    </div>
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel>Edad Calculada</FieldLabel>
+                    <Input value={formData.edad} className="bg-slate-100 text-slate-500 font-bold" readOnly placeholder="Automático" disabled={isSaving} />
+                  </Field>
+                  <Field>
+                    <FieldLabel>Grupo Sanguíneo RH <span className="text-red-500">*</span></FieldLabel>
                     <div className="relative">
                       <Droplets className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-destructive z-10" />
                       <Select value={formData.rh} onValueChange={(v) => handleInputChange("rh", v)} disabled={isSaving}>
