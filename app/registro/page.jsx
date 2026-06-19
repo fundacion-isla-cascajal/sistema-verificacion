@@ -765,21 +765,6 @@ export default function RegistroPublicoPage() {
                   </Field>
                 </>
               )}
-              <div className="space-y-4">
-                <Field>
-                  <FieldLabel>¿Presenta alguna condición especial? <span className="text-red-500">*</span></FieldLabel>
-                  <Select value={formData.condicionEspecial} onValueChange={(v) => { handleInputChange("condicionEspecial", v); if(v==="No") handleInputChange("condicionEspecialCual", ""); }}>
-                    <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
-                    <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
-                  </Select>
-                </Field>
-                {formData.condicionEspecial === "Sí" && (
-                  <Field>
-                    <FieldLabel>¿Cuál es su condición especial? <span className="text-red-500">*</span></FieldLabel>
-                    <Input placeholder="Descríbala brevemente..." value={formData.condicionEspecialCual} onChange={(e) => handleInputChange("condicionEspecialCual", e.target.value)} className="border-red-200" />
-                  </Field>
-                )}
-              </div>
             </CardContent>
           </Card>
 
@@ -888,6 +873,22 @@ export default function RegistroPublicoPage() {
                     </Field>
                   )}
                 </div>
+              </div>
+
+              <div className="space-y-4 mt-2">
+                <Field>
+                  <FieldLabel>¿Presenta alguna condición especial? <span className="text-red-500">*</span></FieldLabel>
+                  <Select value={formData.condicionEspecial} onValueChange={(v) => { handleInputChange("condicionEspecial", v); if(v==="No") handleInputChange("condicionEspecialCual", ""); }}>
+                    <SelectTrigger className="border-red-200"><SelectValue placeholder="Seleccione" /></SelectTrigger>
+                    <SelectContent><SelectItem value="Sí">Sí</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
+                  </Select>
+                </Field>
+                {formData.condicionEspecial === "Sí" && (
+                  <Field>
+                    <FieldLabel>¿Cuál es su condición especial? <span className="text-red-500">*</span></FieldLabel>
+                    <Input placeholder="Descríbala brevemente..." value={formData.condicionEspecialCual} onChange={(e) => handleInputChange("condicionEspecialCual", e.target.value)} className="border-red-200" />
+                  </Field>
+                )}
               </div>
             </CardContent>
           </Card>
